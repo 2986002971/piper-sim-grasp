@@ -1,0 +1,10 @@
+# Example from the original project hand-eye calibration; replace for your device.
+# p_Link6 = tcp_T_camera * p_d405_color_optical_frame, translation in meters.
+tcp_frame: Link6
+camera_frame: d405_color_optical_frame
+
+tcp_T_camera:
+  - [0.9977791863, -0.0662632332, -0.0067734228, -0.0123028218]
+  - [0.0638580978,  0.9226997272,  0.3801938410, -0.0739755665]
+  - [-0.0189430378, -0.3797820392, 0.9248820271,  0.0469442357]
+  - [0.0, 0.0, 0.0, 1.0]

@@ -1,0 +1,91 @@
+{
+  "repository": "https://github.com/agilexrobotics/piper_isaac_sim",
+  "commit": "8e1f88fdb7afca49c40e9a0c1c01cc588e86f0d2",
+  "realsense_source": {
+    "repository": "https://github.com/realsenseai/realsense-ros",
+    "commit": "bafc21080c5c8e259dadbb309797949aee0dd950"
+  },
+  "files": [
+    {
+      "path": "piper_x_description/meshes/dae/J1.dae",
+      "sha256": "e78dee99bc84857c09183463f3fb3fdea292ea7570f1bfb0001a79674bb69d45"
+    },
+    {
+      "path": "piper_x_description/meshes/dae/J2.dae",
+      "sha256": "97e9079580af6e423317c33b2a0f4fe0f6dbc67c3e1d9e6f4836c87c6c8f34a2"
+    },
+    {
+      "path": "piper_x_description/meshes/dae/J3.dae",
+      "sha256": "db5b39eef745655a67e57870d8ee56f26a03651d2161635ca2ec3c58c9269907"
+    },
+    {
+      "path": "piper_x_description/meshes/dae/J4.dae",
+      "sha256": "ccc08d3ef1cb8bdfb8ab5395ff65893d13386ad526d7bc954d468b7dc885d557"
+    },
+    {
+      "path": "piper_x_description/meshes/dae/J5.dae",
+      "sha256": "78718679ffdf9d81130047c4267ed66a081315eff36f216833bc3781c6241417"
+    },
+    {
+      "path": "piper_x_description/meshes/dae/J7.dae",
+      "sha256": "7534447abb248829c447a8e19d84c6fb3903ab70ebc32dfd164abcc4099fc74a"
+    },
+    {
+      "path": "piper_x_description/meshes/dae/J8.dae",
+      "sha256": "662d36ce7edf3e1cbb887302f4499a76aff75ccf1996730fa63f2a30f749adda"
+    },
+    {
+      "path": "piper_x_description/meshes/dae/base_Link.dae",
+      "sha256": "7f2251dbce131f23e0c23a98bd4ef3fc6c071dbcbcfc8b6cb71350a0f4bff76c"
+    },
+    {
+      "path": "piper_x_description/meshes/dae/gripper_base_100_v2.dae",
+      "sha256": "b5dd490ade6a0fea939e43d490106d09f90a5de5e5bab55e2ff139925f2e47ab"
+    },
+    {
+      "path": "piper_x_description/package.xml",
+      "sha256": "cdb218bce0c6f1f8618fa537c38640d25984acd0dd9bf9aa590aa9b14e85a505"
+    },
+    {
+      "path": "piper_x_description/urdf/piper_x_description.urdf",
+      "sha256": "7d4b9bcb49f9d337fa429a681c360af9a86a465ebd2d6d405aecfa0ddd7b20d8"
+    },
+    {
+      "path": "realsense2_description/LICENSE",
+      "sha256": "1c72ac904e86caaa9dbf1740d8d4737264712699e8a7f416cfe15591f21a2cbf",
+      "repository": "realsenseai/realsense-ros",
+      "commit": "bafc21080c5c8e259dadbb309797949aee0dd950",
+      "upstream_path": "LICENSE"
+    },
+    {
+      "path": "realsense2_description/meshes/d405.stl",
+      "sha256": "a248f41149d12b28311829feecbe7a80cf1481fd05e0f5df2c4c7ecd556edd48"
+    },
+    {
+      "path": "realsense2_description/package.xml",
+      "sha256": "73c0fe593f574dd3cea0e57378c437c2671d3fdb2db2d32341d599799ee2be59"
+    },
+    {
+      "path": "realsense2_description/urdf/_d405.urdf.xacro",
+      "sha256": "5a39829166a7d1a0a90b15afc6a3b074438bb990c9a53d6d2218dbe6848f9616"
+    },
+    {
+      "path": "realsense2_description/urdf/_materials.urdf.xacro",
+      "sha256": "11ad1502a90114a20f02f707744b84e001e6c1c1ba5026b2509bcbcd525e5d48"
+    },
+    {
+      "path": "realsense2_description/urdf/_usb_plug.urdf.xacro",
+      "sha256": "63e6c96710eeecde1a6c981dd6d88f1958b4f0f6d50b80dd8c30a35f0a001732"
+    }
+  ],
+  "bracket": {
+    "page": "https://agilexsupport.yuque.com/staff-hso6mo/tetraz/km95una15ctk4b17?singleDoc",
+    "step_sha256": "09e16217aae82f9f4c349b1a563d972f6b6164c7b178209bd0582149059fa02e",
+    "verified_attachment": true,
+    "attachment_url": "https://agilexsupport.yuque.com/attachments/yuque/0/2026/zip/39017709/1773047321602-8185f707-a75f-4213-8e35-aaca5960b92e.zip",
+    "attachment_name": "intel realsense D405标准相机支架.zip",
+    "attachment_sha256": "682ad68b6ad0805eb123791b58006d1f6c90a3e770a54e6e562c6efcb83bd069",
+    "member": "405相机支架.STEP",
+    "requires_authentication": true
+  }
+}
