@@ -1,29 +1,44 @@
 # Piper Sim Grasp
 
-Isaac Sim 服务端、TURN/TCP 串流管理、Piper X + D405 模型准备及离线抓取实验。
-项目自有代码采用 [MIT](LICENSE)；下载的第三方模型不属于项目 MIT 授权。
+为持续开发中的 NankaiRoboCup2026 提供 AutoDL 仿真设备：Piper、D405、ROS 2 Humble 和可选 WebRTC 串流。兼容适配留在本仓库，主项目继续使用原有 ROS 接口和仿真时间支持。
 
-- [服务端部署](docs/deployment.md)：安装、模型、平台转发、预检、启停和日志。
-- [模型与坐标约定](models/README.md)：固定来源、官方支架首次登录下载、离线缓存。
-- [迁移与恢复](docs/migration.md)、[排障](docs/troubleshooting.md)。
-- [技术调查](docs/history/streaming-investigation.md)、[延迟短测](docs/isaac-turn-latency-quick.md)、[验证范围](docs/verification.md)。
-- [第三方声明](THIRD_PARTY_NOTICES.md)。
+首个目标平台：Ubuntu 22.04、x86_64、RTX 4090、Isaac Sim 6.1。基础环境版本见 [版本清单](config/versions.lock.json)。主项目版本由开发者选择，本仓库不负责同步、拉取或切换主项目。
 
-客户端已拆分为独立 `piper-stream-viewer` Git 仓库。已构建包只需要 Python ≥3.10 和普通浏览器；
-TURN 视频及控制由浏览器直接传输，本机 Python 只提供页面和配置。服务端不需要客户端 checkout。
+以下命令从服务器上的仓库根目录执行；机器配置和场景包由使用者准备。服务器首次使用：
 
 ```bash
-python3 server/manage.py preflight --config /path/outside/repo/server.json
-python3 server/manage.py start --config /path/outside/repo/server.json
-python3 server/manage.py status --config /path/outside/repo/server.json
-python3 server/manage.py export-client --config /path/outside/repo/server.json --output /path/outside/repo/client.json
-python3 server/manage.py stop --config /path/outside/repo/server.json
+bash deploy/bootstrap.sh /private/machine.json
+./piper --config /private/machine.json --local assets import /path/to/7up-v1.tar.gz
+./piper --config /private/machine.json --local build
+./piper --config /private/machine.json --local doctor
+./piper --config /private/machine.json --local check devices
 ```
 
-默认 TURN。`server/` 管理 Isaac、coturn、HAProxy；`models/` 下载和生成仓库外资产；
-`legacy/` 保留隔离的 relay 回退；`simulation/` 是需要外部依赖的可选研究工具。
-当前场景提供机械臂、100 mm 夹爪和 D405 几何/坐标框架，没有 D405 RGB-D 传感器输出。
+机器配置从 [示例](config/machine.example.json) 创建，放在仓库外。基础设备不需要主项目；填写 `main_project` 和推理模型输入后可构建抓取接入层。
 
-当前信令是 WS，页面是本机 HTTP，媒体经平台 TCP/HAProxy/coturn 承载。
-管理仍由 Linux 管理机的 SSH 连接拥有，远端 worker 有 75 分钟 watchdog。
-统一 HTTPS/WSS 托管、容器持久 supervisor 和长期稳定性属于后续工作。
+使用串流前，将机器配置中的 `streaming.enabled` 设为 `true`，填入当前实例的公网 TCP 映射和凭据路径，再执行一次 `deploy`。基础示例默认不启用串流。
+
+日常管理（`start` 占用前台，后续命令在另一个终端执行）：
+
+```bash
+./piper --config /private/machine.json start --stream
+./piper --config /private/machine.json status
+./piper --config /private/machine.json export-client --output /private/client.json
+./piper --config /private/machine.json experiment start
+./piper --config /private/machine.json experiment cancel
+./piper --config /private/machine.json stop
+```
+
+`experiment` 命令需要先配置并构建外部主项目；仅使用基础设备时跳过它。等待 `status` 显示 ROS 设备就绪再启动实验，等待串流初始化再导出 Viewer 配置。
+
+配置有 `ssh` 时，管理命令在 Linux 管理机通过 SSH 执行；在服务器直接运行时加 `--local`。不需要串流时使用 `start --headless`。两种模式都使用同一个 Isaac 设备运行核心。
+
+- [架构](docs/architecture.md)：目录、进程、ROS／TF／时间边界。
+- [部署](docs/deployment.md)：裸机安装、外部主项目、模型输入和旧配置迁移。
+- [操作](docs/operation.md)：启停、实验、串流和日志。
+- [资产](docs/assets.md)：完整场景包、相对引用和模型制作。
+- [排障](docs/troubleshooting.md)、[验收状态](docs/verification.md)。
+
+Viewer 是独立的 `piper-stream-viewer` 仓库，服务器无需其源码或 Node。当前完整预定位、夹爪 Action、瓶子接触标定与完整抓取仍未完成；设备闭环通过不代表完整抓取通过。
+
+项目自有代码采用 [MIT](LICENSE)，第三方资产见 [声明](THIRD_PARTY_NOTICES.md)。

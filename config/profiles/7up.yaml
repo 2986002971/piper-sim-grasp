@@ -1,0 +1,107 @@
+# Reviewed device and scene contract; gains are checks, never overrides.
+articulation_prim: ''
+camera_prim: ''
+align_kinematics_to_ros_model: true
+driver_namespace: /piper_l/standalone
+initial_joint_positions:
+- -0.423197
+- 1.01429
+- -1.37436
+- 1.24916
+- -0.17006
+- 1.88319
+gripper_width_m: 0.1
+physics_hz: 100.0
+# USD angular gains 400 / 50 per degree become 400 / 50 * 180/pi in PhysX radians.
+arm_drive_stiffness: 22918.3118052
+arm_drive_damping: 2864.78897565
+gripper_drive_stiffness: 400.0
+gripper_drive_damping: 50.0
+camera_hz: 30.0
+optical_frame: d405_color_optical_frame
+camera_mount:
+- -0.009151761490955
+- -0.083919291408042
+- 0.035616147945832
+- -0.1736517824
+- 2.319e-06
+- -1.32266e-05
+- 0.9848071173
+bridge_command_topic: /isaac/piper/joint_command
+bridge_feedback_topic: /isaac/piper/joint_states
+rgb_topic: /camera/d405/color/image_raw
+depth_topic: /camera/d405/aligned_depth_to_color/image_raw
+camera_info_topic: /camera/d405/color/camera_info
+scene_boxes:
+- id: table_top
+  size:
+  - 0.9
+  - 0.8
+  - 0.06
+  position:
+  - 0.25
+  - 0
+  - -0.03
+  quaternion:
+  - 0
+  - 0
+  - 0
+  - 1
+- id: table_leg_0
+  size:
+  - 0.05
+  - 0.05
+  - 0.7
+  position:
+  - -0.15
+  - -0.32
+  - -0.38
+  quaternion:
+  - 0
+  - 0
+  - 0
+  - 1
+- id: table_leg_1
+  size:
+  - 0.05
+  - 0.05
+  - 0.7
+  position:
+  - -0.15
+  - 0.32
+  - -0.38
+  quaternion:
+  - 0
+  - 0
+  - 0
+  - 1
+- id: table_leg_2
+  size:
+  - 0.05
+  - 0.05
+  - 0.7
+  position:
+  - 0.65
+  - -0.32
+  - -0.38
+  quaternion:
+  - 0
+  - 0
+  - 0
+  - 1
+- id: table_leg_3
+  size:
+  - 0.05
+  - 0.05
+  - 0.7
+  position:
+  - 0.65
+  - 0.32
+  - -0.38
+  quaternion:
+  - 0
+  - 0
+  - 0
+  - 1
+bottle_radius_m: 0.03656
+execution_timeout_s: 180.0

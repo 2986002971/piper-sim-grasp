@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "repo_path": "/root/autodl-tmp/piper-sim-grasp",
+  "data_root": "/root/autodl-tmp/piper-data",
+  "profile": "7up",
+  "main_project": null,
+  "pypi_index_url": "https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple",
+  "ros_domain_id": 0,
+  "watchdog_seconds": 4500,
+  "ssh": {"remote": "root@YOUR_AUTODL_HOST", "port": 22},
+  "streaming": {
+    "enabled": false,
+    "host": "YOUR_AUTODL_PUBLIC_HOST",
+    "signaling_port": 50239,
+    "turn_port": 27645,
+    "credentials_file": "/root/autodl-tmp/piper-data/private/turn.json"
+  }
+}

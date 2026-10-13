@@ -1,0 +1,1329 @@
+{
+  "schema_version": 1,
+  "goal_zh": "收集制作 2026 日本 RoboCup@Home 比赛 Isaac Sim 抓取与放置仿真所需的各种三维模型；优先网络模型，补齐碰撞体、贴图、质量、惯量、接触参数，缺失再自行建模。",
+  "status": "simulation_baseline_not_calibrated",
+  "materials": {
+    "metal": {
+      "static_friction": 0.35,
+      "dynamic_friction": 0.25,
+      "restitution": 0.05,
+      "friction_combine_mode": "average",
+      "restitution_combine_mode": "average",
+      "status": "engineering_initial_guess_requires_pair_calibration",
+      "sweep_ranges": {
+        "static_friction": [
+          0.2,
+          0.9
+        ],
+        "dynamic_friction": [
+          0.15,
+          0.75
+        ],
+        "restitution": [
+          0,
+          0.2
+        ]
+      }
+    },
+    "ceramic": {
+      "static_friction": 0.45,
+      "dynamic_friction": 0.35,
+      "restitution": 0.05,
+      "friction_combine_mode": "average",
+      "restitution_combine_mode": "average",
+      "status": "engineering_initial_guess_requires_pair_calibration",
+      "sweep_ranges": {
+        "static_friction": [
+          0.2,
+          0.9
+        ],
+        "dynamic_friction": [
+          0.15,
+          0.75
+        ],
+        "restitution": [
+          0,
+          0.2
+        ]
+      }
+    },
+    "glass": {
+      "static_friction": 0.4,
+      "dynamic_friction": 0.3,
+      "restitution": 0.05,
+      "friction_combine_mode": "average",
+      "restitution_combine_mode": "average",
+      "status": "engineering_initial_guess_requires_pair_calibration",
+      "sweep_ranges": {
+        "static_friction": [
+          0.2,
+          0.9
+        ],
+        "dynamic_friction": [
+          0.15,
+          0.75
+        ],
+        "restitution": [
+          0,
+          0.2
+        ]
+      }
+    },
+    "paperboard": {
+      "static_friction": 0.55,
+      "dynamic_friction": 0.45,
+      "restitution": 0.02,
+      "friction_combine_mode": "average",
+      "restitution_combine_mode": "average",
+      "status": "engineering_initial_guess_requires_pair_calibration",
+      "sweep_ranges": {
+        "static_friction": [
+          0.2,
+          0.9
+        ],
+        "dynamic_friction": [
+          0.15,
+          0.75
+        ],
+        "restitution": [
+          0,
+          0.2
+        ]
+      }
+    },
+    "plastic": {
+      "static_friction": 0.5,
+      "dynamic_friction": 0.4,
+      "restitution": 0.03,
+      "friction_combine_mode": "average",
+      "restitution_combine_mode": "average",
+      "status": "engineering_initial_guess_requires_pair_calibration",
+      "sweep_ranges": {
+        "static_friction": [
+          0.2,
+          0.9
+        ],
+        "dynamic_friction": [
+          0.15,
+          0.75
+        ],
+        "restitution": [
+          0,
+          0.2
+        ]
+      }
+    },
+    "wood": {
+      "static_friction": 0.55,
+      "dynamic_friction": 0.45,
+      "restitution": 0.03,
+      "friction_combine_mode": "average",
+      "restitution_combine_mode": "average",
+      "status": "engineering_initial_guess_requires_pair_calibration",
+      "sweep_ranges": {
+        "static_friction": [
+          0.2,
+          0.9
+        ],
+        "dynamic_friction": [
+          0.15,
+          0.75
+        ],
+        "restitution": [
+          0,
+          0.2
+        ]
+      }
+    },
+    "food": {
+      "static_friction": 0.6,
+      "dynamic_friction": 0.5,
+      "restitution": 0.02,
+      "friction_combine_mode": "average",
+      "restitution_combine_mode": "average",
+      "status": "engineering_initial_guess_requires_pair_calibration",
+      "sweep_ranges": {
+        "static_friction": [
+          0.2,
+          0.9
+        ],
+        "dynamic_friction": [
+          0.15,
+          0.75
+        ],
+        "restitution": [
+          0,
+          0.2
+        ]
+      }
+    },
+    "rubber_gripper": {
+      "static_friction": 0.8,
+      "dynamic_friction": 0.65,
+      "restitution": 0,
+      "friction_combine_mode": "average",
+      "restitution_combine_mode": "average",
+      "status": "engineering_initial_guess_requires_pair_calibration",
+      "sweep_ranges": {
+        "static_friction": [
+          0.2,
+          0.9
+        ],
+        "dynamic_friction": [
+          0.15,
+          0.75
+        ],
+        "restitution": [
+          0,
+          0.2
+        ]
+      }
+    },
+    "table": {
+      "static_friction": 0.6,
+      "dynamic_friction": 0.5,
+      "restitution": 0,
+      "friction_combine_mode": "average",
+      "restitution_combine_mode": "average",
+      "status": "engineering_initial_guess_requires_pair_calibration",
+      "sweep_ranges": {
+        "static_friction": [
+          0.2,
+          0.9
+        ],
+        "dynamic_friction": [
+          0.15,
+          0.75
+        ],
+        "restitution": [
+          0,
+          0.2
+        ]
+      }
+    }
+  },
+  "solver": {
+    "contact_offset_m": 0.001,
+    "rest_offset_m": 0.0,
+    "enable_ccd": true,
+    "linear_damping": 0.01,
+    "angular_damping": 0.05,
+    "solver_position_iterations": 16,
+    "solver_velocity_iterations": 4,
+    "max_depenetration_velocity_m_s": 1.0,
+    "recommended_timestep_s": 0.004166666666666667,
+    "gravity_m_s2": 9.81
+  },
+  "objects": {
+    "002_master_chef_can": {
+      "source_up_axis": "Z",
+      "nominal_size": null,
+      "mass_kg": 0.414,
+      "mass_status": "published_reference_object",
+      "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+      "mass_uncertainty_fraction": 0.1,
+      "material": "metal",
+      "state": "reference_sample",
+      "mass_distribution_model": "uniform_volume",
+      "collision_method": "convex_hull",
+      "concavity_tolerance_m": 0.002,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured."
+      ]
+    },
+    "003_cracker_box": {
+      "source_up_axis": "Z",
+      "nominal_size": null,
+      "mass_kg": 0.411,
+      "mass_status": "published_reference_object",
+      "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+      "mass_uncertainty_fraction": 0.1,
+      "material": "paperboard",
+      "state": "reference_sample",
+      "mass_distribution_model": "uniform_volume",
+      "collision_method": "box",
+      "concavity_tolerance_m": 0.002,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured."
+      ]
+    },
+    "004_sugar_box": {
+      "source_up_axis": "Z",
+      "nominal_size": null,
+      "mass_kg": 0.514,
+      "mass_status": "published_reference_object",
+      "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+      "mass_uncertainty_fraction": 0.1,
+      "material": "paperboard",
+      "state": "reference_sample",
+      "mass_distribution_model": "uniform_volume",
+      "collision_method": "box",
+      "concavity_tolerance_m": 0.002,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured."
+      ]
+    },
+    "005_tomato_soup_can": {
+      "source_up_axis": "Z",
+      "nominal_size": null,
+      "mass_kg": 0.349,
+      "mass_status": "published_reference_object",
+      "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+      "mass_uncertainty_fraction": 0.1,
+      "material": "metal",
+      "state": "reference_sample",
+      "mass_distribution_model": "uniform_volume",
+      "collision_method": "convex_hull",
+      "concavity_tolerance_m": 0.002,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured."
+      ]
+    },
+    "006_mustard_bottle": {
+      "source_up_axis": "Z",
+      "nominal_size": null,
+      "mass_kg": 0.603,
+      "mass_status": "published_reference_object",
+      "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+      "mass_uncertainty_fraction": 0.1,
+      "material": "plastic",
+      "state": "reference_sample",
+      "mass_distribution_model": "uniform_volume",
+      "collision_method": "coacd",
+      "concavity_tolerance_m": 0.002,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured."
+      ]
+    },
+    "007_tuna_fish_can": {
+      "source_up_axis": "Z",
+      "nominal_size": null,
+      "mass_kg": 0.171,
+      "mass_status": "published_reference_object",
+      "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+      "mass_uncertainty_fraction": 0.1,
+      "material": "metal",
+      "state": "reference_sample",
+      "mass_distribution_model": "uniform_volume",
+      "collision_method": "convex_hull",
+      "concavity_tolerance_m": 0.002,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured."
+      ]
+    },
+    "008_pudding_box": {
+      "source_up_axis": "Z",
+      "nominal_size": null,
+      "mass_kg": 0.187,
+      "mass_status": "published_reference_object",
+      "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+      "mass_uncertainty_fraction": 0.1,
+      "material": "paperboard",
+      "state": "reference_sample",
+      "mass_distribution_model": "uniform_volume",
+      "collision_method": "box",
+      "concavity_tolerance_m": 0.002,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured."
+      ]
+    },
+    "009_gelatin_box": {
+      "source_up_axis": "Z",
+      "nominal_size": null,
+      "mass_kg": 0.097,
+      "mass_status": "published_reference_object",
+      "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+      "mass_uncertainty_fraction": 0.1,
+      "material": "paperboard",
+      "state": "reference_sample",
+      "mass_distribution_model": "uniform_volume",
+      "collision_method": "box",
+      "concavity_tolerance_m": 0.002,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured."
+      ]
+    },
+    "010_potted_meat_can": {
+      "source_up_axis": "Z",
+      "nominal_size": null,
+      "mass_kg": 0.37,
+      "mass_status": "published_reference_object",
+      "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+      "mass_uncertainty_fraction": 0.1,
+      "material": "metal",
+      "state": "reference_sample",
+      "mass_distribution_model": "uniform_volume",
+      "collision_method": "convex_hull",
+      "concavity_tolerance_m": 0.002,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured."
+      ]
+    },
+    "011_banana": {
+      "source_up_axis": "Z",
+      "nominal_size": null,
+      "mass_kg": 0.066,
+      "mass_status": "published_reference_object",
+      "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+      "mass_uncertainty_fraction": 0.1,
+      "material": "wood",
+      "state": "reference_sample",
+      "mass_distribution_model": "uniform_volume",
+      "collision_method": "coacd",
+      "concavity_tolerance_m": 0.002,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured."
+      ]
+    },
+    "012_strawberry": {
+      "source_up_axis": "Z",
+      "nominal_size": null,
+      "mass_kg": 0.018,
+      "mass_status": "published_reference_object",
+      "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+      "mass_uncertainty_fraction": 0.1,
+      "material": "wood",
+      "state": "reference_sample",
+      "mass_distribution_model": "uniform_volume",
+      "collision_method": "convex_hull",
+      "concavity_tolerance_m": 0.002,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured."
+      ]
+    },
+    "013_apple": {
+      "source_up_axis": "Z",
+      "nominal_size": null,
+      "mass_kg": 0.068,
+      "mass_status": "published_reference_object",
+      "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+      "mass_uncertainty_fraction": 0.1,
+      "material": "wood",
+      "state": "reference_sample",
+      "mass_distribution_model": "uniform_volume",
+      "collision_method": "convex_hull",
+      "concavity_tolerance_m": 0.002,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured."
+      ]
+    },
+    "014_lemon": {
+      "source_up_axis": "Z",
+      "nominal_size": null,
+      "mass_kg": 0.029,
+      "mass_status": "published_reference_object",
+      "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+      "mass_uncertainty_fraction": 0.1,
+      "material": "wood",
+      "state": "reference_sample",
+      "mass_distribution_model": "uniform_volume",
+      "collision_method": "convex_hull",
+      "concavity_tolerance_m": 0.002,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured."
+      ]
+    },
+    "016_pear": {
+      "source_up_axis": "Z",
+      "nominal_size": null,
+      "mass_kg": 0.049,
+      "mass_status": "published_reference_object",
+      "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+      "mass_uncertainty_fraction": 0.1,
+      "material": "wood",
+      "state": "reference_sample",
+      "mass_distribution_model": "uniform_volume",
+      "collision_method": "convex_hull",
+      "concavity_tolerance_m": 0.002,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured."
+      ]
+    },
+    "017_orange": {
+      "source_up_axis": "Z",
+      "nominal_size": null,
+      "mass_kg": 0.047,
+      "mass_status": "published_reference_object",
+      "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+      "mass_uncertainty_fraction": 0.1,
+      "material": "wood",
+      "state": "reference_sample",
+      "mass_distribution_model": "uniform_volume",
+      "collision_method": "convex_hull",
+      "concavity_tolerance_m": 0.002,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured."
+      ]
+    },
+    "019_pitcher_base": {
+      "source_up_axis": "Z",
+      "nominal_size": null,
+      "mass_kg": 0.178,
+      "mass_status": "published_reference_object",
+      "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+      "mass_uncertainty_fraction": 0.1,
+      "material": "plastic",
+      "state": "closed_scanned_surface_grasp_proxy",
+      "mass_distribution_model": "surface_lamina",
+      "collision_method": "coacd",
+      "concavity_tolerance_m": 0.002,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured.",
+        "The source scan has a closed top surface: central and grid rays hit the top near 0.242 m. This asset is a grasp/place proxy; do not use it as an open pitcher or for pouring. A measured open interior must be modeled separately."
+      ]
+    },
+    "021_bleach_cleanser": {
+      "source_up_axis": "Z",
+      "nominal_size": null,
+      "mass_kg": 1.131,
+      "mass_status": "published_reference_object",
+      "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+      "mass_uncertainty_fraction": 0.1,
+      "material": "plastic",
+      "state": "reference_sample",
+      "mass_distribution_model": "uniform_volume",
+      "collision_method": "coacd",
+      "concavity_tolerance_m": 0.003,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured."
+      ]
+    },
+    "022_windex_bottle": {
+      "source_up_axis": "Z",
+      "nominal_size": null,
+      "mass_kg": 1.022,
+      "mass_status": "published_reference_object",
+      "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+      "mass_uncertainty_fraction": 0.1,
+      "material": "plastic",
+      "state": "reference_sample",
+      "mass_distribution_model": "uniform_volume",
+      "collision_method": "coacd",
+      "concavity_tolerance_m": 0.003,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured."
+      ]
+    },
+    "024_bowl": {
+      "source_up_axis": "Z",
+      "nominal_size": null,
+      "mass_kg": 0.147,
+      "mass_status": "published_reference_object",
+      "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+      "mass_uncertainty_fraction": 0.1,
+      "material": "metal",
+      "state": "reference_sample",
+      "mass_distribution_model": "surface_lamina",
+      "collision_method": "coacd",
+      "concavity_tolerance_m": 0.001,
+      "cavity_probe": true,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured."
+      ]
+    },
+    "025_mug": {
+      "source_up_axis": "Z",
+      "nominal_size": null,
+      "mass_kg": 0.118,
+      "mass_status": "published_reference_object",
+      "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+      "mass_uncertainty_fraction": 0.1,
+      "material": "metal",
+      "state": "reference_sample",
+      "mass_distribution_model": "surface_lamina",
+      "collision_method": "coacd",
+      "concavity_tolerance_m": 0.001,
+      "cavity_probe": true,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured."
+      ]
+    },
+    "029_plate": {
+      "source_up_axis": "Z",
+      "nominal_size": null,
+      "mass_kg": 0.279,
+      "mass_status": "published_reference_object",
+      "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+      "mass_uncertainty_fraction": 0.1,
+      "material": "metal",
+      "state": "reference_sample",
+      "mass_distribution_model": "surface_lamina",
+      "collision_method": "coacd",
+      "concavity_tolerance_m": 0.001,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured."
+      ]
+    },
+    "030_fork": {
+      "source_up_axis": "Z",
+      "nominal_size": null,
+      "mass_kg": 0.034,
+      "mass_status": "published_reference_object",
+      "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+      "mass_uncertainty_fraction": 0.1,
+      "material": "metal",
+      "state": "reference_sample",
+      "mass_distribution_model": "surface_lamina",
+      "collision_method": "coacd",
+      "concavity_tolerance_m": 0.001,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured."
+      ]
+    },
+    "031_spoon": {
+      "source_up_axis": "Z",
+      "nominal_size": null,
+      "mass_kg": 0.03,
+      "mass_status": "published_reference_object",
+      "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+      "mass_uncertainty_fraction": 0.1,
+      "material": "metal",
+      "state": "reference_sample",
+      "mass_distribution_model": "surface_lamina",
+      "collision_method": "coacd",
+      "concavity_tolerance_m": 0.001,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured."
+      ]
+    },
+    "032_knife": {
+      "source_up_axis": "Z",
+      "nominal_size": null,
+      "mass_kg": 0.031,
+      "mass_status": "published_reference_object",
+      "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+      "mass_uncertainty_fraction": 0.1,
+      "material": "metal",
+      "state": "reference_sample",
+      "mass_distribution_model": "surface_lamina",
+      "collision_method": "coacd",
+      "concavity_tolerance_m": 0.001,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured."
+      ]
+    },
+    "036_wood_block": {
+      "source_up_axis": "Z",
+      "nominal_size": null,
+      "mass_kg": 0.729,
+      "mass_status": "published_reference_object",
+      "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+      "mass_uncertainty_fraction": 0.1,
+      "material": "wood",
+      "state": "reference_sample",
+      "mass_distribution_model": "uniform_volume",
+      "collision_method": "box",
+      "concavity_tolerance_m": 0.002,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured."
+      ]
+    },
+    "037_scissors": {
+      "source_up_axis": "Z",
+      "nominal_size": null,
+      "mass_kg": 0.082,
+      "mass_status": "published_reference_object",
+      "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+      "mass_uncertainty_fraction": 0.1,
+      "material": "metal",
+      "state": "reference_sample",
+      "mass_distribution_model": "uniform_volume",
+      "collision_method": "coacd",
+      "concavity_tolerance_m": 0.002,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured."
+      ]
+    },
+    "040_large_marker": {
+      "source_up_axis": "Z",
+      "nominal_size": null,
+      "mass_kg": 0.0158,
+      "mass_status": "published_reference_object",
+      "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+      "mass_uncertainty_fraction": 0.1,
+      "material": "plastic",
+      "state": "reference_sample",
+      "mass_distribution_model": "uniform_volume",
+      "collision_method": "convex_hull",
+      "concavity_tolerance_m": 0.002,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured."
+      ]
+    },
+    "043_phillips_screwdriver": {
+      "source_up_axis": "Z",
+      "nominal_size": null,
+      "mass_kg": 0.097,
+      "mass_status": "published_reference_object",
+      "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+      "mass_uncertainty_fraction": 0.1,
+      "material": "plastic",
+      "state": "reference_sample",
+      "mass_distribution_model": "uniform_volume",
+      "collision_method": "coacd",
+      "concavity_tolerance_m": 0.002,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured."
+      ]
+    },
+    "gso_Vans_Cereal_Honey_Nut_Crunch_11_oz_box": {
+      "source_up_axis": "Z",
+      "nominal_size": null,
+      "mass_kg": 0.36,
+      "mass_status": "engineering_assumption_not_measured",
+      "mass_source": null,
+      "mass_uncertainty_fraction": 0.5,
+      "material": "paperboard",
+      "state": "sealed_full_11oz_cereal_plus_assumed_box",
+      "mass_distribution_model": "uniform_volume",
+      "collision_method": "box",
+      "concavity_tolerance_m": 0.002,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured."
+      ]
+    },
+    "gso_Threshold_Bead_Cereal_Bowl_White": {
+      "source_up_axis": "Z",
+      "nominal_size": null,
+      "mass_kg": 0.35,
+      "mass_status": "engineering_assumption_not_measured",
+      "mass_source": null,
+      "mass_uncertainty_fraction": 0.5,
+      "material": "ceramic",
+      "state": "empty_ceramic_container",
+      "mass_distribution_model": "surface_lamina",
+      "collision_method": "coacd",
+      "concavity_tolerance_m": 0.001,
+      "cavity_probe": true,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured."
+      ]
+    },
+    "gso_Threshold_Porcelain_Coffee_Mug_All_Over_Bead_White": {
+      "source_up_axis": "Z",
+      "nominal_size": null,
+      "mass_kg": 0.34,
+      "mass_status": "engineering_assumption_not_measured",
+      "mass_source": null,
+      "mass_uncertainty_fraction": 0.5,
+      "material": "ceramic",
+      "state": "empty_ceramic_container",
+      "mass_distribution_model": "surface_lamina",
+      "collision_method": "coacd",
+      "concavity_tolerance_m": 0.001,
+      "cavity_probe": true,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured."
+      ]
+    },
+    "gso_Threshold_Dinner_Plate_Square_Rim_White_Porcelain": {
+      "source_up_axis": "Z",
+      "nominal_size": null,
+      "mass_kg": 0.65,
+      "mass_status": "engineering_assumption_not_measured",
+      "mass_source": null,
+      "mass_uncertainty_fraction": 0.5,
+      "material": "ceramic",
+      "state": "empty_ceramic_container",
+      "mass_distribution_model": "surface_lamina",
+      "collision_method": "coacd",
+      "concavity_tolerance_m": 0.001,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured."
+      ]
+    },
+    "kenney_carton": {
+      "source_up_axis": "Y",
+      "nominal_size": {
+        "dimension": "height",
+        "value_m": 0.24,
+        "status": "nominal_sample_dimension_not_competition_measurement"
+      },
+      "mass_kg": 1.05,
+      "mass_status": "engineering_assumption_not_measured",
+      "mass_source": null,
+      "mass_uncertainty_fraction": 0.5,
+      "material": "paperboard",
+      "state": "sealed_full_1L_milk_rigid_contents",
+      "mass_distribution_model": "uniform_volume",
+      "collision_method": "convex_hull",
+      "concavity_tolerance_m": 0.002,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured.",
+        "Stylized rigid proxy with assumed nominal size; source art dimensions are not meters."
+      ]
+    },
+    "kenney_carton_small": {
+      "source_up_axis": "Y",
+      "nominal_size": {
+        "dimension": "height",
+        "value_m": 0.12,
+        "status": "nominal_sample_dimension_not_competition_measurement"
+      },
+      "mass_kg": 0.265,
+      "mass_status": "engineering_assumption_not_measured",
+      "mass_source": null,
+      "mass_uncertainty_fraction": 0.5,
+      "material": "paperboard",
+      "state": "sealed_full_250mL_milk_rigid_contents",
+      "mass_distribution_model": "uniform_volume",
+      "collision_method": "convex_hull",
+      "concavity_tolerance_m": 0.002,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured.",
+        "Stylized rigid proxy with assumed nominal size; source art dimensions are not meters."
+      ]
+    },
+    "kenney_glass": {
+      "source_up_axis": "Y",
+      "nominal_size": {
+        "dimension": "height",
+        "value_m": 0.14,
+        "status": "nominal_sample_dimension_not_competition_measurement"
+      },
+      "mass_kg": 0.18,
+      "mass_status": "engineering_assumption_not_measured",
+      "mass_source": null,
+      "mass_uncertainty_fraction": 0.5,
+      "material": "glass",
+      "state": "empty_glass",
+      "mass_distribution_model": "surface_lamina",
+      "collision_method": "triangle_shell",
+      "concavity_tolerance_m": 0.001,
+      "cavity_probe": true,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured.",
+        "Stylized rigid proxy with assumed nominal size; source art dimensions are not meters.",
+        "Collision uses a 1 mm surface extrusion, merging only connected convex planar patches; it preserves openings without voxel remeshing."
+      ],
+      "collision_shell_thickness_m": 0.001
+    },
+    "kenney_cup": {
+      "source_up_axis": "Y",
+      "nominal_size": {
+        "dimension": "height",
+        "value_m": 0.1,
+        "status": "nominal_sample_dimension_not_competition_measurement"
+      },
+      "mass_kg": 0.06,
+      "mass_status": "engineering_assumption_not_measured",
+      "mass_source": null,
+      "mass_uncertainty_fraction": 0.5,
+      "material": "plastic",
+      "state": "empty_plastic_cup",
+      "mass_distribution_model": "surface_lamina",
+      "collision_method": "triangle_shell",
+      "concavity_tolerance_m": 0.001,
+      "cavity_probe": true,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured.",
+        "Stylized rigid proxy with assumed nominal size; source art dimensions are not meters.",
+        "Collision uses a 1 mm surface extrusion, merging only connected convex planar patches; it preserves openings without voxel remeshing."
+      ],
+      "collision_shell_thickness_m": 0.001
+    },
+    "kenney_mug": {
+      "source_up_axis": "Y",
+      "nominal_size": {
+        "dimension": "height",
+        "value_m": 0.1,
+        "status": "nominal_sample_dimension_not_competition_measurement"
+      },
+      "mass_kg": 0.3,
+      "mass_status": "engineering_assumption_not_measured",
+      "mass_source": null,
+      "mass_uncertainty_fraction": 0.5,
+      "material": "ceramic",
+      "state": "empty_ceramic_mug",
+      "mass_distribution_model": "surface_lamina",
+      "collision_method": "triangle_shell",
+      "concavity_tolerance_m": 0.001,
+      "cavity_probe": true,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured.",
+        "Stylized rigid proxy with assumed nominal size; source art dimensions are not meters.",
+        "Collision uses a 1 mm surface extrusion, merging only connected convex planar patches; it preserves openings without voxel remeshing."
+      ],
+      "collision_shell_thickness_m": 0.001
+    },
+    "kenney_bowl": {
+      "source_up_axis": "Y",
+      "nominal_size": {
+        "dimension": "max_extent",
+        "value_m": 0.16,
+        "status": "nominal_sample_dimension_not_competition_measurement"
+      },
+      "mass_kg": 0.35,
+      "mass_status": "engineering_assumption_not_measured",
+      "mass_source": null,
+      "mass_uncertainty_fraction": 0.5,
+      "material": "ceramic",
+      "state": "empty_ceramic_bowl",
+      "mass_distribution_model": "surface_lamina",
+      "collision_method": "triangle_shell",
+      "concavity_tolerance_m": 0.001,
+      "cavity_probe": true,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured.",
+        "Stylized rigid proxy with assumed nominal size; source art dimensions are not meters.",
+        "Collision uses a 1 mm surface extrusion, merging only connected convex planar patches; it preserves openings without voxel remeshing."
+      ],
+      "collision_shell_thickness_m": 0.001
+    },
+    "kenney_plate": {
+      "source_up_axis": "Y",
+      "nominal_size": {
+        "dimension": "max_extent",
+        "value_m": 0.24,
+        "status": "nominal_sample_dimension_not_competition_measurement"
+      },
+      "mass_kg": 0.5,
+      "mass_status": "engineering_assumption_not_measured",
+      "mass_source": null,
+      "mass_uncertainty_fraction": 0.5,
+      "material": "ceramic",
+      "state": "empty_ceramic_plate",
+      "mass_distribution_model": "surface_lamina",
+      "collision_method": "triangle_shell",
+      "concavity_tolerance_m": 0.001,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured.",
+        "Stylized rigid proxy with assumed nominal size; source art dimensions are not meters.",
+        "Collision uses a 1 mm surface extrusion, merging only connected convex planar patches; it preserves openings without voxel remeshing."
+      ],
+      "collision_shell_thickness_m": 0.001
+    },
+    "kenney_soda_can": {
+      "source_up_axis": "Y",
+      "nominal_size": {
+        "dimension": "height",
+        "value_m": 0.122,
+        "status": "nominal_sample_dimension_not_competition_measurement"
+      },
+      "mass_kg": 0.37,
+      "mass_status": "engineering_assumption_not_measured",
+      "mass_source": null,
+      "mass_uncertainty_fraction": 0.5,
+      "material": "metal",
+      "state": "sealed_full_330mL_drink_rigid_contents",
+      "mass_distribution_model": "uniform_volume",
+      "collision_method": "convex_hull",
+      "concavity_tolerance_m": 0.002,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured.",
+        "Stylized rigid proxy with assumed nominal size; source art dimensions are not meters."
+      ]
+    },
+    "kenney_soda_bottle": {
+      "source_up_axis": "Y",
+      "nominal_size": {
+        "dimension": "height",
+        "value_m": 0.215,
+        "status": "nominal_sample_dimension_not_competition_measurement"
+      },
+      "mass_kg": 0.53,
+      "mass_status": "engineering_assumption_not_measured",
+      "mass_source": null,
+      "mass_uncertainty_fraction": 0.5,
+      "material": "plastic",
+      "state": "sealed_full_500mL_drink_rigid_contents",
+      "mass_distribution_model": "uniform_volume",
+      "collision_method": "triangle_shell",
+      "concavity_tolerance_m": 0.002,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured.",
+        "Stylized rigid proxy with assumed nominal size; source art dimensions are not meters.",
+        "Collision uses a 1 mm surface extrusion, merging only connected convex planar patches; it preserves openings without voxel remeshing.",
+        "If source is open, use the visual convex hull as a separate uniform mass proxy; collision shell is not treated as full rigid contents."
+      ],
+      "collision_shell_thickness_m": 0.001
+    },
+    "kenney_soda_can_crushed": {
+      "source_up_axis": "Y",
+      "nominal_size": {
+        "dimension": "max_extent",
+        "value_m": 0.065,
+        "status": "nominal_sample_dimension_not_competition_measurement"
+      },
+      "mass_kg": 0.014,
+      "mass_status": "engineering_assumption_not_measured",
+      "mass_source": null,
+      "mass_uncertainty_fraction": 0.5,
+      "material": "metal",
+      "state": "empty_crushed_can",
+      "mass_distribution_model": "surface_lamina",
+      "collision_method": "triangle_shell",
+      "concavity_tolerance_m": 0.001,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured.",
+        "Stylized rigid proxy with assumed nominal size; source art dimensions are not meters.",
+        "Collision uses a 1 mm surface extrusion, merging only connected convex planar patches; it preserves openings without voxel remeshing."
+      ],
+      "collision_shell_thickness_m": 0.001
+    },
+    "kenney_can_open": {
+      "source_up_axis": "Y",
+      "nominal_size": {
+        "dimension": "height",
+        "value_m": 0.11,
+        "status": "nominal_sample_dimension_not_competition_measurement"
+      },
+      "mass_kg": 0.25,
+      "mass_status": "engineering_assumption_not_measured",
+      "mass_source": null,
+      "mass_uncertainty_fraction": 0.5,
+      "material": "metal",
+      "state": "opened_can_with_static_contents_mass_assumed",
+      "mass_distribution_model": "uniform_volume",
+      "collision_method": "triangle_shell",
+      "concavity_tolerance_m": 0.001,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured.",
+        "Stylized rigid proxy with assumed nominal size; source art dimensions are not meters.",
+        "Collision uses a 1 mm surface extrusion, merging only connected convex planar patches; it preserves openings without voxel remeshing.",
+        "Upstream preview shows static contents covering the central opening; this is not an empty-can cavity asset. 250 g is an assumed loaded mass."
+      ],
+      "collision_shell_thickness_m": 0.001
+    },
+    "kenney_candy_bar_wrapper": {
+      "source_up_axis": "Y",
+      "nominal_size": {
+        "dimension": "max_extent",
+        "value_m": 0.12,
+        "status": "nominal_sample_dimension_not_competition_measurement"
+      },
+      "mass_kg": 0.002,
+      "mass_status": "engineering_assumption_not_measured",
+      "mass_source": null,
+      "mass_uncertainty_fraction": 0.5,
+      "material": "plastic",
+      "state": "empty_wrapper_rigid_proxy",
+      "mass_distribution_model": "surface_lamina",
+      "collision_method": "triangle_shell",
+      "concavity_tolerance_m": 0.001,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured.",
+        "Stylized rigid proxy with assumed nominal size; source art dimensions are not meters.",
+        "Collision uses a 1 mm surface extrusion, merging only connected convex planar patches; it preserves openings without voxel remeshing."
+      ],
+      "collision_shell_thickness_m": 0.001
+    },
+    "kenney_fish_bones": {
+      "source_up_axis": "Y",
+      "nominal_size": {
+        "dimension": "max_extent",
+        "value_m": 0.16,
+        "status": "nominal_sample_dimension_not_competition_measurement"
+      },
+      "mass_kg": 0.012,
+      "mass_status": "engineering_assumption_not_measured",
+      "mass_source": null,
+      "mass_uncertainty_fraction": 0.5,
+      "material": "food",
+      "state": "rigid_fish_skeleton_proxy",
+      "mass_distribution_model": "surface_lamina",
+      "collision_method": "triangle_shell",
+      "concavity_tolerance_m": 0.001,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured.",
+        "Stylized rigid proxy with assumed nominal size; source art dimensions are not meters.",
+        "Collision uses a 1 mm surface extrusion, merging only connected convex planar patches; it preserves openings without voxel remeshing."
+      ],
+      "collision_shell_thickness_m": 0.001
+    },
+    "kenney_popsicle_stick": {
+      "source_up_axis": "Y",
+      "nominal_size": {
+        "dimension": "max_extent",
+        "value_m": 0.114,
+        "status": "nominal_sample_dimension_not_competition_measurement"
+      },
+      "mass_kg": 0.002,
+      "mass_status": "engineering_assumption_not_measured",
+      "mass_source": null,
+      "mass_uncertainty_fraction": 0.5,
+      "material": "wood",
+      "state": "dry_wooden_stick",
+      "mass_distribution_model": "surface_lamina",
+      "collision_method": "box",
+      "concavity_tolerance_m": 0.001,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured.",
+        "Stylized rigid proxy with assumed nominal size; source art dimensions are not meters."
+      ]
+    },
+    "kenney_burger": {
+      "source_up_axis": "Y",
+      "nominal_size": {
+        "dimension": "max_extent",
+        "value_m": 0.105,
+        "status": "nominal_sample_dimension_not_competition_measurement"
+      },
+      "mass_kg": 0.18,
+      "mass_status": "engineering_assumption_not_measured",
+      "mass_source": null,
+      "mass_uncertainty_fraction": 0.5,
+      "material": "food",
+      "state": "rigid_food_proxy",
+      "mass_distribution_model": "uniform_volume",
+      "collision_method": "triangle_shell",
+      "concavity_tolerance_m": 0.002,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured.",
+        "Stylized rigid proxy with assumed nominal size; source art dimensions are not meters.",
+        "Collision uses a 1 mm surface extrusion, merging only connected convex planar patches; it preserves openings without voxel remeshing.",
+        "If source is open, use the visual convex hull as a separate uniform mass proxy; collision shell is not treated as full rigid contents."
+      ],
+      "collision_shell_thickness_m": 0.001
+    },
+    "kenney_sandwich": {
+      "source_up_axis": "Y",
+      "nominal_size": {
+        "dimension": "max_extent",
+        "value_m": 0.12,
+        "status": "nominal_sample_dimension_not_competition_measurement"
+      },
+      "mass_kg": 0.12,
+      "mass_status": "engineering_assumption_not_measured",
+      "mass_source": null,
+      "mass_uncertainty_fraction": 0.5,
+      "material": "food",
+      "state": "rigid_food_proxy",
+      "mass_distribution_model": "uniform_volume",
+      "collision_method": "convex_hull",
+      "concavity_tolerance_m": 0.002,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured.",
+        "Stylized rigid proxy with assumed nominal size; source art dimensions are not meters."
+      ]
+    },
+    "kenney_rice_ball": {
+      "source_up_axis": "Y",
+      "nominal_size": {
+        "dimension": "max_extent",
+        "value_m": 0.07,
+        "status": "nominal_sample_dimension_not_competition_measurement"
+      },
+      "mass_kg": 0.1,
+      "mass_status": "engineering_assumption_not_measured",
+      "mass_source": null,
+      "mass_uncertainty_fraction": 0.5,
+      "material": "food",
+      "state": "rigid_food_proxy",
+      "mass_distribution_model": "uniform_volume",
+      "collision_method": "convex_hull",
+      "concavity_tolerance_m": 0.002,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured.",
+        "Stylized rigid proxy with assumed nominal size; source art dimensions are not meters."
+      ]
+    },
+    "kenney_sushi_salmon": {
+      "source_up_axis": "Y",
+      "nominal_size": {
+        "dimension": "max_extent",
+        "value_m": 0.075,
+        "status": "nominal_sample_dimension_not_competition_measurement"
+      },
+      "mass_kg": 0.035,
+      "mass_status": "engineering_assumption_not_measured",
+      "mass_source": null,
+      "mass_uncertainty_fraction": 0.5,
+      "material": "food",
+      "state": "rigid_food_proxy",
+      "mass_distribution_model": "uniform_volume",
+      "collision_method": "triangle_shell",
+      "concavity_tolerance_m": 0.002,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured.",
+        "Stylized rigid proxy with assumed nominal size; source art dimensions are not meters.",
+        "Collision uses a 1 mm surface extrusion, merging only connected convex planar patches; it preserves openings without voxel remeshing.",
+        "If source is open, use the visual convex hull as a separate uniform mass proxy; collision shell is not treated as full rigid contents."
+      ],
+      "collision_shell_thickness_m": 0.001
+    },
+    "kenney_maki_salmon": {
+      "source_up_axis": "Y",
+      "nominal_size": {
+        "dimension": "max_extent",
+        "value_m": 0.04,
+        "status": "nominal_sample_dimension_not_competition_measurement"
+      },
+      "mass_kg": 0.025,
+      "mass_status": "engineering_assumption_not_measured",
+      "mass_source": null,
+      "mass_uncertainty_fraction": 0.5,
+      "material": "food",
+      "state": "rigid_food_proxy",
+      "mass_distribution_model": "uniform_volume",
+      "collision_method": "convex_hull",
+      "concavity_tolerance_m": 0.002,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured.",
+        "Stylized rigid proxy with assumed nominal size; source art dimensions are not meters."
+      ]
+    },
+    "kenney_banana": {
+      "source_up_axis": "Y",
+      "nominal_size": {
+        "dimension": "max_extent",
+        "value_m": 0.18,
+        "status": "nominal_sample_dimension_not_competition_measurement"
+      },
+      "mass_kg": 0.12,
+      "mass_status": "engineering_assumption_not_measured",
+      "mass_source": null,
+      "mass_uncertainty_fraction": 0.5,
+      "material": "food",
+      "state": "rigid_fresh_fruit_proxy",
+      "mass_distribution_model": "uniform_volume",
+      "collision_method": "triangle_shell",
+      "concavity_tolerance_m": 0.002,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured.",
+        "Stylized rigid proxy with assumed nominal size; source art dimensions are not meters.",
+        "Collision uses a 1 mm surface extrusion, merging only connected convex planar patches; it preserves openings without voxel remeshing.",
+        "If source is open, use the visual convex hull as a separate uniform mass proxy; collision shell is not treated as full rigid contents."
+      ],
+      "collision_shell_thickness_m": 0.001
+    },
+    "kenney_apple": {
+      "source_up_axis": "Y",
+      "nominal_size": {
+        "dimension": "max_extent",
+        "value_m": 0.075,
+        "status": "nominal_sample_dimension_not_competition_measurement"
+      },
+      "mass_kg": 0.15,
+      "mass_status": "engineering_assumption_not_measured",
+      "mass_source": null,
+      "mass_uncertainty_fraction": 0.5,
+      "material": "food",
+      "state": "rigid_fresh_fruit_proxy",
+      "mass_distribution_model": "uniform_volume",
+      "collision_method": "convex_hull",
+      "concavity_tolerance_m": 0.002,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured.",
+        "Stylized rigid proxy with assumed nominal size; source art dimensions are not meters."
+      ]
+    },
+    "kenney_utensil_fork": {
+      "source_up_axis": "Y",
+      "nominal_size": {
+        "dimension": "max_extent",
+        "value_m": 0.19,
+        "status": "nominal_sample_dimension_not_competition_measurement"
+      },
+      "mass_kg": 0.034,
+      "mass_status": "engineering_assumption_not_measured",
+      "mass_source": null,
+      "mass_uncertainty_fraction": 0.5,
+      "material": "metal",
+      "state": "steel_fork",
+      "mass_distribution_model": "surface_lamina",
+      "collision_method": "triangle_shell",
+      "concavity_tolerance_m": 0.001,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured.",
+        "Stylized rigid proxy with assumed nominal size; source art dimensions are not meters.",
+        "Collision uses a 1 mm surface extrusion, merging only connected convex planar patches; it preserves openings without voxel remeshing."
+      ],
+      "collision_shell_thickness_m": 0.001
+    },
+    "kenney_utensil_knife": {
+      "source_up_axis": "Y",
+      "nominal_size": {
+        "dimension": "max_extent",
+        "value_m": 0.21,
+        "status": "nominal_sample_dimension_not_competition_measurement"
+      },
+      "mass_kg": 0.031,
+      "mass_status": "engineering_assumption_not_measured",
+      "mass_source": null,
+      "mass_uncertainty_fraction": 0.5,
+      "material": "metal",
+      "state": "steel_knife",
+      "mass_distribution_model": "surface_lamina",
+      "collision_method": "triangle_shell",
+      "concavity_tolerance_m": 0.001,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured.",
+        "Stylized rigid proxy with assumed nominal size; source art dimensions are not meters.",
+        "Collision uses a 1 mm surface extrusion, merging only connected convex planar patches; it preserves openings without voxel remeshing."
+      ],
+      "collision_shell_thickness_m": 0.001
+    },
+    "kenney_utensil_spoon": {
+      "source_up_axis": "Y",
+      "nominal_size": {
+        "dimension": "max_extent",
+        "value_m": 0.18,
+        "status": "nominal_sample_dimension_not_competition_measurement"
+      },
+      "mass_kg": 0.03,
+      "mass_status": "engineering_assumption_not_measured",
+      "mass_source": null,
+      "mass_uncertainty_fraction": 0.5,
+      "material": "metal",
+      "state": "steel_spoon",
+      "mass_distribution_model": "surface_lamina",
+      "collision_method": "triangle_shell",
+      "concavity_tolerance_m": 0.001,
+      "cavity_probe": false,
+      "notes": [
+        "Uniform geometry-based mass distribution is an approximation; component densities and movable contents are not measured.",
+        "Stylized rigid proxy with assumed nominal size; source art dimensions are not meters.",
+        "Collision uses a 1 mm surface extrusion, merging only connected convex planar patches; it preserves openings without voxel remeshing."
+      ],
+      "collision_shell_thickness_m": 0.001
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "platform": {"os": "ubuntu", "version": "22.04", "arch": "x86_64", "verified_gpu": "RTX 4090"},
+  "isaac": "6.1.0.0",
+  "isaac_python": "3.12",
+  "ros": "humble",
+  "cuda": "12.8",
+  "tensorrt": "10.9.0.34",
+  "coturn": "4.18.0",
+  "coturn_sha256": "28d55294ac596fbd129b293a85e7bb1c5dc4bd15b7fb55c500f355149e5f4e28",
+  "ros_apt_source": "1.3.0"
+}

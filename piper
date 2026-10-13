@@ -1,0 +1,6 @@
+#!/usr/bin/python3
+"""Piper simulation deployment and lifecycle. Run ./piper --help."""
+from runtime.cli import main
+
+if __name__ == '__main__':
+    main()

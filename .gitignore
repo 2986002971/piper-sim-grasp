@@ -30,7 +30,7 @@ known_hosts*
 private/
 local/
 results/
-profile*/
+/browser-profiles/
 *.pcap*
 *.mp4
 *.webm

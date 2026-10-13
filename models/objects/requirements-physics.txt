@@ -1,0 +1,9 @@
+# Use Isaac Sim OpenUSD bindings or a separate conda-forge OpenUSD environment.
+# See verification.md for the version used in the recorded asset checks.
+numpy==2.2.6
+scipy==1.15.3
+trimesh==4.11.2
+coacd==1.0.9
+Pillow==12.0.0
+rtree==1.4.1
+networkx==3.4.2

@@ -3,6 +3,7 @@
 import sys
 import traceback
 import os
+import json
 from pathlib import Path
 from isaacsim.simulation_app import SimulationApp
 
@@ -43,6 +44,15 @@ try:
     root=stage.DefinePrim('/piper_x_d405_assembly','Xform')
     root.GetReferences().AddReference('./robot.usd','/Robot')
     stage.SetDefaultPrim(root)
+    from d405_camera import ensure_d405_camera, ensure_d405_depth_camera, RGB_INTRINSICS
+    camera=ensure_d405_camera(stage)
+    depth_camera=ensure_d405_depth_camera(stage,camera)
+    metadata_path=urdf.parent/'assembly.json'
+    metadata=json.loads(metadata_path.read_text())
+    metadata['viewport_camera']={'path':str(camera.GetPath()),'depth_path':str(depth_camera.GetPath()),
+                                 'intrinsics':RGB_INTRINSICS,
+                                 'axes':'USD camera under ROS optical frame: local Rx(pi)'}
+    metadata_path.write_text(json.dumps(metadata,indent=2))
     light=UsdLux.DomeLight.Define(stage,'/EnvironmentLight');light.CreateIntensityAttr(1000)
     stage.GetRootLayer().Save()
     print('PIPER_USD_IMPORTED',flush=True)

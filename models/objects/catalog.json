@@ -1,0 +1,1999 @@
+{
+  "schema_version": 1,
+  "goal_zh": "收集制作 2026 日本 RoboCup@Home 比赛 Isaac Sim 抓取与放置仿真所需的各种三维模型；优先网络模型，补齐碰撞体、贴图、质量、惯量、接触参数，缺失再自行建模。",
+  "excluded": [
+    "bags",
+    "baskets",
+    "deformable_textiles"
+  ],
+  "survey_date": "2026-10-13",
+  "bundles": [
+    {
+      "id": "ycb_002_master_chef_can",
+      "source": {
+        "dataset": "YCB",
+        "page": "https://ycb-benchmarks.s3.amazonaws.com/index.html",
+        "url": "https://ycb-benchmarks.s3.amazonaws.com/data/google/002_master_chef_can_google_16k.tgz",
+        "archive": "tar.gz",
+        "sha256": "2f8dcc63e243911c546058476c35276448601997f5e658296ccdf4a83af24c10",
+        "license": "CC-BY-4.0",
+        "attribution": "Berk Calli, Arjun Singh, Aaron Walsman, Siddhartha Srinivasa, Pieter Abbeel, Aaron Dollar; YCB Object and Model Set",
+        "archive_bytes": 11741544
+      },
+      "objects": [
+        {
+          "id": "002_master_chef_can",
+          "label_zh": "咖啡罐",
+          "category": "food_packaging",
+          "visual_mesh": "002_master_chef_can/google_16k/textured.obj",
+          "required_files": [
+            "002_master_chef_can/google_16k/textured.obj",
+            "002_master_chef_can/google_16k/textured.mtl",
+            "002_master_chef_can/google_16k/texture_map.png"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "dataset_convention_requires_dimension_check",
+          "physics": {
+            "mass_kg": 0.414,
+            "mass_status": "published_reference_object",
+            "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "cylinder",
+            "status": "not_authored"
+          },
+          "competition_match": "generic_category_example"
+        }
+      ]
+    },
+    {
+      "id": "ycb_003_cracker_box",
+      "source": {
+        "dataset": "YCB",
+        "page": "https://ycb-benchmarks.s3.amazonaws.com/index.html",
+        "url": "https://ycb-benchmarks.s3.amazonaws.com/data/google/003_cracker_box_google_16k.tgz",
+        "archive": "tar.gz",
+        "sha256": "0f084b0212274700d416384b9bc290521257d2b15ab66f68768a6a22806226b6",
+        "license": "CC-BY-4.0",
+        "attribution": "Berk Calli, Arjun Singh, Aaron Walsman, Siddhartha Srinivasa, Pieter Abbeel, Aaron Dollar; YCB Object and Model Set",
+        "archive_bytes": 11434893
+      },
+      "objects": [
+        {
+          "id": "003_cracker_box",
+          "label_zh": "饼干盒",
+          "category": "food_packaging",
+          "visual_mesh": "003_cracker_box/google_16k/textured.obj",
+          "required_files": [
+            "003_cracker_box/google_16k/textured.obj",
+            "003_cracker_box/google_16k/textured.mtl",
+            "003_cracker_box/google_16k/texture_map.png"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "dataset_convention_requires_dimension_check",
+          "physics": {
+            "mass_kg": 0.411,
+            "mass_status": "published_reference_object",
+            "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "box",
+            "status": "not_authored"
+          },
+          "competition_match": "generic_category_example"
+        }
+      ]
+    },
+    {
+      "id": "ycb_004_sugar_box",
+      "source": {
+        "dataset": "YCB",
+        "page": "https://ycb-benchmarks.s3.amazonaws.com/index.html",
+        "url": "https://ycb-benchmarks.s3.amazonaws.com/data/google/004_sugar_box_google_16k.tgz",
+        "archive": "tar.gz",
+        "sha256": "38e5820b942e7db501ba105cfb42ba8b470f27540dbab95324105a52de8617c6",
+        "license": "CC-BY-4.0",
+        "attribution": "Berk Calli, Arjun Singh, Aaron Walsman, Siddhartha Srinivasa, Pieter Abbeel, Aaron Dollar; YCB Object and Model Set",
+        "archive_bytes": 12636314
+      },
+      "objects": [
+        {
+          "id": "004_sugar_box",
+          "label_zh": "糖盒",
+          "category": "food_packaging",
+          "visual_mesh": "004_sugar_box/google_16k/textured.obj",
+          "required_files": [
+            "004_sugar_box/google_16k/textured.obj",
+            "004_sugar_box/google_16k/textured.mtl",
+            "004_sugar_box/google_16k/texture_map.png"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "dataset_convention_requires_dimension_check",
+          "physics": {
+            "mass_kg": 0.514,
+            "mass_status": "published_reference_object",
+            "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "box",
+            "status": "not_authored"
+          },
+          "competition_match": "generic_category_example"
+        }
+      ]
+    },
+    {
+      "id": "ycb_005_tomato_soup_can",
+      "source": {
+        "dataset": "YCB",
+        "page": "https://ycb-benchmarks.s3.amazonaws.com/index.html",
+        "url": "https://ycb-benchmarks.s3.amazonaws.com/data/google/005_tomato_soup_can_google_16k.tgz",
+        "archive": "tar.gz",
+        "sha256": "264f28559475e8e548b20420a7b6db944b4b27471039a73733d2c08a4ba2cc3d",
+        "license": "CC-BY-4.0",
+        "attribution": "Berk Calli, Arjun Singh, Aaron Walsman, Siddhartha Srinivasa, Pieter Abbeel, Aaron Dollar; YCB Object and Model Set",
+        "archive_bytes": 10606298
+      },
+      "objects": [
+        {
+          "id": "005_tomato_soup_can",
+          "label_zh": "汤罐",
+          "category": "food_packaging",
+          "visual_mesh": "005_tomato_soup_can/google_16k/textured.obj",
+          "required_files": [
+            "005_tomato_soup_can/google_16k/textured.obj",
+            "005_tomato_soup_can/google_16k/textured.mtl",
+            "005_tomato_soup_can/google_16k/texture_map.png"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "dataset_convention_requires_dimension_check",
+          "physics": {
+            "mass_kg": 0.349,
+            "mass_status": "published_reference_object",
+            "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "cylinder",
+            "status": "not_authored"
+          },
+          "competition_match": "generic_category_example"
+        }
+      ]
+    },
+    {
+      "id": "ycb_006_mustard_bottle",
+      "source": {
+        "dataset": "YCB",
+        "page": "https://ycb-benchmarks.s3.amazonaws.com/index.html",
+        "url": "https://ycb-benchmarks.s3.amazonaws.com/data/google/006_mustard_bottle_google_16k.tgz",
+        "archive": "tar.gz",
+        "sha256": "992621f78a4fa6267da71418e530cd547bd066775da0242e578ddfb561d7cb5d",
+        "license": "CC-BY-4.0",
+        "attribution": "Berk Calli, Arjun Singh, Aaron Walsman, Siddhartha Srinivasa, Pieter Abbeel, Aaron Dollar; YCB Object and Model Set",
+        "archive_bytes": 10703139
+      },
+      "objects": [
+        {
+          "id": "006_mustard_bottle",
+          "label_zh": "芥末瓶",
+          "category": "food_packaging",
+          "visual_mesh": "006_mustard_bottle/google_16k/textured.obj",
+          "required_files": [
+            "006_mustard_bottle/google_16k/textured.obj",
+            "006_mustard_bottle/google_16k/textured.mtl",
+            "006_mustard_bottle/google_16k/texture_map.png"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "dataset_convention_requires_dimension_check",
+          "physics": {
+            "mass_kg": 0.603,
+            "mass_status": "published_reference_object",
+            "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "convex_decomposition",
+            "status": "not_authored"
+          },
+          "competition_match": "generic_category_example"
+        }
+      ]
+    },
+    {
+      "id": "ycb_007_tuna_fish_can",
+      "source": {
+        "dataset": "YCB",
+        "page": "https://ycb-benchmarks.s3.amazonaws.com/index.html",
+        "url": "https://ycb-benchmarks.s3.amazonaws.com/data/google/007_tuna_fish_can_google_16k.tgz",
+        "archive": "tar.gz",
+        "sha256": "b44bde265f9ebab879680ad843fafedb9c6549c7414f7325c66faa49207cd502",
+        "license": "CC-BY-4.0",
+        "attribution": "Berk Calli, Arjun Singh, Aaron Walsman, Siddhartha Srinivasa, Pieter Abbeel, Aaron Dollar; YCB Object and Model Set",
+        "archive_bytes": 8938529
+      },
+      "objects": [
+        {
+          "id": "007_tuna_fish_can",
+          "label_zh": "金枪鱼罐头",
+          "category": "food_packaging",
+          "visual_mesh": "007_tuna_fish_can/google_16k/textured.obj",
+          "required_files": [
+            "007_tuna_fish_can/google_16k/textured.obj",
+            "007_tuna_fish_can/google_16k/textured.mtl",
+            "007_tuna_fish_can/google_16k/texture_map.png"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "dataset_convention_requires_dimension_check",
+          "physics": {
+            "mass_kg": 0.171,
+            "mass_status": "published_reference_object",
+            "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "cylinder",
+            "status": "not_authored"
+          },
+          "competition_match": "generic_category_example"
+        }
+      ]
+    },
+    {
+      "id": "ycb_008_pudding_box",
+      "source": {
+        "dataset": "YCB",
+        "page": "https://ycb-benchmarks.s3.amazonaws.com/index.html",
+        "url": "https://ycb-benchmarks.s3.amazonaws.com/data/google/008_pudding_box_google_16k.tgz",
+        "archive": "tar.gz",
+        "sha256": "3c7ea25076552304a570abef26146ee5621e0a7b432ec435b42d0aabe8273440",
+        "license": "CC-BY-4.0",
+        "attribution": "Berk Calli, Arjun Singh, Aaron Walsman, Siddhartha Srinivasa, Pieter Abbeel, Aaron Dollar; YCB Object and Model Set",
+        "archive_bytes": 10164954
+      },
+      "objects": [
+        {
+          "id": "008_pudding_box",
+          "label_zh": "布丁盒",
+          "category": "food_packaging",
+          "visual_mesh": "008_pudding_box/google_16k/textured.obj",
+          "required_files": [
+            "008_pudding_box/google_16k/textured.obj",
+            "008_pudding_box/google_16k/textured.mtl",
+            "008_pudding_box/google_16k/texture_map.png"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "dataset_convention_requires_dimension_check",
+          "physics": {
+            "mass_kg": 0.187,
+            "mass_status": "published_reference_object",
+            "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "box",
+            "status": "not_authored"
+          },
+          "competition_match": "generic_category_example"
+        }
+      ]
+    },
+    {
+      "id": "ycb_009_gelatin_box",
+      "source": {
+        "dataset": "YCB",
+        "page": "https://ycb-benchmarks.s3.amazonaws.com/index.html",
+        "url": "https://ycb-benchmarks.s3.amazonaws.com/data/google/009_gelatin_box_google_16k.tgz",
+        "archive": "tar.gz",
+        "sha256": "426b76c4a63c7ec719d0c78a9570871c2cdad7671a47b3a831b303740083c5b5",
+        "license": "CC-BY-4.0",
+        "attribution": "Berk Calli, Arjun Singh, Aaron Walsman, Siddhartha Srinivasa, Pieter Abbeel, Aaron Dollar; YCB Object and Model Set",
+        "archive_bytes": 9815773
+      },
+      "objects": [
+        {
+          "id": "009_gelatin_box",
+          "label_zh": "果冻盒",
+          "category": "food_packaging",
+          "visual_mesh": "009_gelatin_box/google_16k/textured.obj",
+          "required_files": [
+            "009_gelatin_box/google_16k/textured.obj",
+            "009_gelatin_box/google_16k/textured.mtl",
+            "009_gelatin_box/google_16k/texture_map.png"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "dataset_convention_requires_dimension_check",
+          "physics": {
+            "mass_kg": 0.097,
+            "mass_status": "published_reference_object",
+            "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "box",
+            "status": "not_authored"
+          },
+          "competition_match": "generic_category_example"
+        }
+      ]
+    },
+    {
+      "id": "ycb_010_potted_meat_can",
+      "source": {
+        "dataset": "YCB",
+        "page": "https://ycb-benchmarks.s3.amazonaws.com/index.html",
+        "url": "https://ycb-benchmarks.s3.amazonaws.com/data/google/010_potted_meat_can_google_16k.tgz",
+        "archive": "tar.gz",
+        "sha256": "197f0741d40c740e94bccb11dec6be7a4d6473dd3d140f500a0b4357efcab604",
+        "license": "CC-BY-4.0",
+        "attribution": "Berk Calli, Arjun Singh, Aaron Walsman, Siddhartha Srinivasa, Pieter Abbeel, Aaron Dollar; YCB Object and Model Set",
+        "archive_bytes": 9656325
+      },
+      "objects": [
+        {
+          "id": "010_potted_meat_can",
+          "label_zh": "肉罐头",
+          "category": "food_packaging",
+          "visual_mesh": "010_potted_meat_can/google_16k/textured.obj",
+          "required_files": [
+            "010_potted_meat_can/google_16k/textured.obj",
+            "010_potted_meat_can/google_16k/textured.mtl",
+            "010_potted_meat_can/google_16k/texture_map.png"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "dataset_convention_requires_dimension_check",
+          "physics": {
+            "mass_kg": 0.37,
+            "mass_status": "published_reference_object",
+            "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "convex_hull",
+            "status": "not_authored"
+          },
+          "competition_match": "generic_category_example"
+        }
+      ]
+    },
+    {
+      "id": "ycb_011_banana",
+      "source": {
+        "dataset": "YCB",
+        "page": "https://ycb-benchmarks.s3.amazonaws.com/index.html",
+        "url": "https://ycb-benchmarks.s3.amazonaws.com/data/google/011_banana_google_16k.tgz",
+        "archive": "tar.gz",
+        "sha256": "bad03e98066dec02ea1536ff2fa58f068efa97e9dbc89fceb4418f1ec633c881",
+        "license": "CC-BY-4.0",
+        "attribution": "Berk Calli, Arjun Singh, Aaron Walsman, Siddhartha Srinivasa, Pieter Abbeel, Aaron Dollar; YCB Object and Model Set",
+        "archive_bytes": 5715660
+      },
+      "objects": [
+        {
+          "id": "011_banana",
+          "label_zh": "香蕉（仿真水果）",
+          "category": "food",
+          "visual_mesh": "011_banana/google_16k/textured.obj",
+          "required_files": [
+            "011_banana/google_16k/textured.obj",
+            "011_banana/google_16k/textured.mtl",
+            "011_banana/google_16k/texture_map.png"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "dataset_convention_requires_dimension_check",
+          "physics": {
+            "mass_kg": 0.066,
+            "mass_status": "published_reference_object",
+            "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "convex_decomposition",
+            "status": "not_authored"
+          },
+          "competition_match": "generic_category_example"
+        }
+      ]
+    },
+    {
+      "id": "ycb_012_strawberry",
+      "source": {
+        "dataset": "YCB",
+        "page": "https://ycb-benchmarks.s3.amazonaws.com/index.html",
+        "url": "https://ycb-benchmarks.s3.amazonaws.com/data/google/012_strawberry_google_16k.tgz",
+        "archive": "tar.gz",
+        "sha256": "377955b6d931541fd5dc082eefbdd686ea835cbea7f5e3ab6c1bfb8c60499012",
+        "license": "CC-BY-4.0",
+        "attribution": "Berk Calli, Arjun Singh, Aaron Walsman, Siddhartha Srinivasa, Pieter Abbeel, Aaron Dollar; YCB Object and Model Set",
+        "archive_bytes": 6888074
+      },
+      "objects": [
+        {
+          "id": "012_strawberry",
+          "label_zh": "草莓（仿真水果）",
+          "category": "food",
+          "visual_mesh": "012_strawberry/google_16k/textured.obj",
+          "required_files": [
+            "012_strawberry/google_16k/textured.obj",
+            "012_strawberry/google_16k/textured.mtl",
+            "012_strawberry/google_16k/texture_map.png"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "dataset_convention_requires_dimension_check",
+          "physics": {
+            "mass_kg": 0.018,
+            "mass_status": "published_reference_object",
+            "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "convex_hull",
+            "status": "not_authored"
+          },
+          "competition_match": "generic_category_example"
+        }
+      ]
+    },
+    {
+      "id": "ycb_013_apple",
+      "source": {
+        "dataset": "YCB",
+        "page": "https://ycb-benchmarks.s3.amazonaws.com/index.html",
+        "url": "https://ycb-benchmarks.s3.amazonaws.com/data/google/013_apple_google_16k.tgz",
+        "archive": "tar.gz",
+        "sha256": "46249b76379bae26a6f78861b5568ceed25cf1e397530a313430b1d94d57320c",
+        "license": "CC-BY-4.0",
+        "attribution": "Berk Calli, Arjun Singh, Aaron Walsman, Siddhartha Srinivasa, Pieter Abbeel, Aaron Dollar; YCB Object and Model Set",
+        "archive_bytes": 5950199
+      },
+      "objects": [
+        {
+          "id": "013_apple",
+          "label_zh": "苹果（仿真水果）",
+          "category": "food",
+          "visual_mesh": "013_apple/google_16k/textured.obj",
+          "required_files": [
+            "013_apple/google_16k/textured.obj",
+            "013_apple/google_16k/textured.mtl",
+            "013_apple/google_16k/texture_map.png"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "dataset_convention_requires_dimension_check",
+          "physics": {
+            "mass_kg": 0.068,
+            "mass_status": "published_reference_object",
+            "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "convex_hull",
+            "status": "not_authored"
+          },
+          "competition_match": "generic_category_example"
+        }
+      ]
+    },
+    {
+      "id": "ycb_014_lemon",
+      "source": {
+        "dataset": "YCB",
+        "page": "https://ycb-benchmarks.s3.amazonaws.com/index.html",
+        "url": "https://ycb-benchmarks.s3.amazonaws.com/data/google/014_lemon_google_16k.tgz",
+        "archive": "tar.gz",
+        "sha256": "5b18a5c7b097893cbd1a5c12ef8ee03aa0b62d300a9610377f1b131575da5a45",
+        "license": "CC-BY-4.0",
+        "attribution": "Berk Calli, Arjun Singh, Aaron Walsman, Siddhartha Srinivasa, Pieter Abbeel, Aaron Dollar; YCB Object and Model Set",
+        "archive_bytes": 5501313
+      },
+      "objects": [
+        {
+          "id": "014_lemon",
+          "label_zh": "柠檬（仿真水果）",
+          "category": "food",
+          "visual_mesh": "014_lemon/google_16k/textured.obj",
+          "required_files": [
+            "014_lemon/google_16k/textured.obj",
+            "014_lemon/google_16k/textured.mtl",
+            "014_lemon/google_16k/texture_map.png"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "dataset_convention_requires_dimension_check",
+          "physics": {
+            "mass_kg": 0.029,
+            "mass_status": "published_reference_object",
+            "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "convex_hull",
+            "status": "not_authored"
+          },
+          "competition_match": "generic_category_example"
+        }
+      ]
+    },
+    {
+      "id": "ycb_016_pear",
+      "source": {
+        "dataset": "YCB",
+        "page": "https://ycb-benchmarks.s3.amazonaws.com/index.html",
+        "url": "https://ycb-benchmarks.s3.amazonaws.com/data/google/016_pear_google_16k.tgz",
+        "archive": "tar.gz",
+        "sha256": "9847a4a7f21b821538ffb4881edc0569d546bbf8360b1583f04c1f1c617639c6",
+        "license": "CC-BY-4.0",
+        "attribution": "Berk Calli, Arjun Singh, Aaron Walsman, Siddhartha Srinivasa, Pieter Abbeel, Aaron Dollar; YCB Object and Model Set",
+        "archive_bytes": 5905739
+      },
+      "objects": [
+        {
+          "id": "016_pear",
+          "label_zh": "梨（仿真水果）",
+          "category": "food",
+          "visual_mesh": "016_pear/google_16k/textured.obj",
+          "required_files": [
+            "016_pear/google_16k/textured.obj",
+            "016_pear/google_16k/textured.mtl",
+            "016_pear/google_16k/texture_map.png"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "dataset_convention_requires_dimension_check",
+          "physics": {
+            "mass_kg": 0.049,
+            "mass_status": "published_reference_object",
+            "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "convex_hull",
+            "status": "not_authored"
+          },
+          "competition_match": "generic_category_example"
+        }
+      ]
+    },
+    {
+      "id": "ycb_017_orange",
+      "source": {
+        "dataset": "YCB",
+        "page": "https://ycb-benchmarks.s3.amazonaws.com/index.html",
+        "url": "https://ycb-benchmarks.s3.amazonaws.com/data/google/017_orange_google_16k.tgz",
+        "archive": "tar.gz",
+        "sha256": "74d70a3d338d03f9c6afd4a8e1d3f8ec7a6f0e52fd0771c33c497e05920b4631",
+        "license": "CC-BY-4.0",
+        "attribution": "Berk Calli, Arjun Singh, Aaron Walsman, Siddhartha Srinivasa, Pieter Abbeel, Aaron Dollar; YCB Object and Model Set",
+        "archive_bytes": 5221002
+      },
+      "objects": [
+        {
+          "id": "017_orange",
+          "label_zh": "橙子（仿真水果）",
+          "category": "food",
+          "visual_mesh": "017_orange/google_16k/textured.obj",
+          "required_files": [
+            "017_orange/google_16k/textured.obj",
+            "017_orange/google_16k/textured.mtl",
+            "017_orange/google_16k/texture_map.png"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "dataset_convention_requires_dimension_check",
+          "physics": {
+            "mass_kg": 0.047,
+            "mass_status": "published_reference_object",
+            "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "convex_hull",
+            "status": "not_authored"
+          },
+          "competition_match": "generic_category_example"
+        }
+      ]
+    },
+    {
+      "id": "ycb_019_pitcher_base",
+      "source": {
+        "dataset": "YCB",
+        "page": "https://ycb-benchmarks.s3.amazonaws.com/index.html",
+        "url": "https://ycb-benchmarks.s3.amazonaws.com/data/google/019_pitcher_base_google_16k.tgz",
+        "archive": "tar.gz",
+        "sha256": "cba78f0521f38b98d43b648bf68fd788373b43628f1941f476a5adb35819a8aa",
+        "license": "CC-BY-4.0",
+        "attribution": "Berk Calli, Arjun Singh, Aaron Walsman, Siddhartha Srinivasa, Pieter Abbeel, Aaron Dollar; YCB Object and Model Set",
+        "archive_bytes": 7017301
+      },
+      "objects": [
+        {
+          "id": "019_pitcher_base",
+          "label_zh": "水壶主体",
+          "category": "tableware",
+          "visual_mesh": "019_pitcher_base/google_16k/textured.obj",
+          "required_files": [
+            "019_pitcher_base/google_16k/textured.obj",
+            "019_pitcher_base/google_16k/textured.mtl",
+            "019_pitcher_base/google_16k/texture_map.png"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "dataset_convention_requires_dimension_check",
+          "physics": {
+            "mass_kg": 0.178,
+            "mass_status": "published_reference_object",
+            "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "concavity_preserving",
+            "status": "not_authored"
+          },
+          "competition_match": "generic_category_example"
+        }
+      ]
+    },
+    {
+      "id": "ycb_021_bleach_cleanser",
+      "source": {
+        "dataset": "YCB",
+        "page": "https://ycb-benchmarks.s3.amazonaws.com/index.html",
+        "url": "https://ycb-benchmarks.s3.amazonaws.com/data/google/021_bleach_cleanser_google_16k.tgz",
+        "archive": "tar.gz",
+        "sha256": "2d71162158f5b51089a08ea12180d47a6480f4ba986af0c887a93ad5fc867588",
+        "license": "CC-BY-4.0",
+        "attribution": "Berk Calli, Arjun Singh, Aaron Walsman, Siddhartha Srinivasa, Pieter Abbeel, Aaron Dollar; YCB Object and Model Set",
+        "archive_bytes": 10668522
+      },
+      "objects": [
+        {
+          "id": "021_bleach_cleanser",
+          "label_zh": "清洁剂瓶",
+          "category": "household",
+          "visual_mesh": "021_bleach_cleanser/google_16k/textured.obj",
+          "required_files": [
+            "021_bleach_cleanser/google_16k/textured.obj",
+            "021_bleach_cleanser/google_16k/textured.mtl",
+            "021_bleach_cleanser/google_16k/texture_map.png"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "dataset_convention_requires_dimension_check",
+          "physics": {
+            "mass_kg": 1.131,
+            "mass_status": "published_reference_object",
+            "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "convex_decomposition",
+            "status": "not_authored"
+          },
+          "competition_match": "generic_category_example"
+        }
+      ]
+    },
+    {
+      "id": "ycb_022_windex_bottle",
+      "source": {
+        "dataset": "YCB",
+        "page": "https://ycb-benchmarks.s3.amazonaws.com/index.html",
+        "url": "https://ycb-benchmarks.s3.amazonaws.com/data/google/022_windex_bottle_google_16k.tgz",
+        "archive": "tar.gz",
+        "sha256": "f2c77fbeb1a0f348b89317dda7ee9c1648134f92146da2d3c86740ff734c4f80",
+        "license": "CC-BY-4.0",
+        "attribution": "Berk Calli, Arjun Singh, Aaron Walsman, Siddhartha Srinivasa, Pieter Abbeel, Aaron Dollar; YCB Object and Model Set",
+        "archive_bytes": 7944427
+      },
+      "objects": [
+        {
+          "id": "022_windex_bottle",
+          "label_zh": "玻璃清洁剂喷瓶",
+          "category": "household",
+          "visual_mesh": "022_windex_bottle/google_16k/textured.obj",
+          "required_files": [
+            "022_windex_bottle/google_16k/textured.obj",
+            "022_windex_bottle/google_16k/textured.mtl",
+            "022_windex_bottle/google_16k/texture_map.png"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "dataset_convention_requires_dimension_check",
+          "physics": {
+            "mass_kg": 1.022,
+            "mass_status": "published_reference_object",
+            "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "convex_decomposition",
+            "status": "not_authored"
+          },
+          "competition_match": "generic_category_example"
+        }
+      ]
+    },
+    {
+      "id": "ycb_024_bowl",
+      "source": {
+        "dataset": "YCB",
+        "page": "https://ycb-benchmarks.s3.amazonaws.com/index.html",
+        "url": "https://ycb-benchmarks.s3.amazonaws.com/data/google/024_bowl_google_16k.tgz",
+        "archive": "tar.gz",
+        "sha256": "ac73b566d4f17c3cd5956684875c3a20dd4c8777821df62f5fee81f6b7751868",
+        "license": "CC-BY-4.0",
+        "attribution": "Berk Calli, Arjun Singh, Aaron Walsman, Siddhartha Srinivasa, Pieter Abbeel, Aaron Dollar; YCB Object and Model Set",
+        "archive_bytes": 7253020
+      },
+      "objects": [
+        {
+          "id": "024_bowl",
+          "label_zh": "碗（金属搪瓷）",
+          "category": "tableware",
+          "visual_mesh": "024_bowl/google_16k/textured.obj",
+          "required_files": [
+            "024_bowl/google_16k/textured.obj",
+            "024_bowl/google_16k/textured.mtl",
+            "024_bowl/google_16k/texture_map.png"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "dataset_convention_requires_dimension_check",
+          "physics": {
+            "mass_kg": 0.147,
+            "mass_status": "published_reference_object",
+            "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "concavity_preserving",
+            "status": "not_authored"
+          },
+          "competition_match": "generic_category_example"
+        }
+      ]
+    },
+    {
+      "id": "ycb_025_mug",
+      "source": {
+        "dataset": "YCB",
+        "page": "https://ycb-benchmarks.s3.amazonaws.com/index.html",
+        "url": "https://ycb-benchmarks.s3.amazonaws.com/data/google/025_mug_google_16k.tgz",
+        "archive": "tar.gz",
+        "sha256": "4b640afc1baaa940b66948d1e59426d8da2c5a16558c7c7a118bbe28d0737de5",
+        "license": "CC-BY-4.0",
+        "attribution": "Berk Calli, Arjun Singh, Aaron Walsman, Siddhartha Srinivasa, Pieter Abbeel, Aaron Dollar; YCB Object and Model Set",
+        "archive_bytes": 7658239
+      },
+      "objects": [
+        {
+          "id": "025_mug",
+          "label_zh": "马克杯（金属）",
+          "category": "tableware",
+          "visual_mesh": "025_mug/google_16k/textured.obj",
+          "required_files": [
+            "025_mug/google_16k/textured.obj",
+            "025_mug/google_16k/textured.mtl",
+            "025_mug/google_16k/texture_map.png"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "dataset_convention_requires_dimension_check",
+          "physics": {
+            "mass_kg": 0.118,
+            "mass_status": "published_reference_object",
+            "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "concavity_preserving",
+            "status": "not_authored"
+          },
+          "competition_match": "generic_category_example"
+        }
+      ]
+    },
+    {
+      "id": "ycb_029_plate",
+      "source": {
+        "dataset": "YCB",
+        "page": "https://ycb-benchmarks.s3.amazonaws.com/index.html",
+        "url": "https://ycb-benchmarks.s3.amazonaws.com/data/google/029_plate_google_16k.tgz",
+        "archive": "tar.gz",
+        "sha256": "1604d51aa6b7950a1491e7ffab0f8336a625d0a109e4cfb33b7debc94d670255",
+        "license": "CC-BY-4.0",
+        "attribution": "Berk Calli, Arjun Singh, Aaron Walsman, Siddhartha Srinivasa, Pieter Abbeel, Aaron Dollar; YCB Object and Model Set",
+        "archive_bytes": 10003217
+      },
+      "objects": [
+        {
+          "id": "029_plate",
+          "label_zh": "盘子（金属）",
+          "category": "tableware",
+          "visual_mesh": "029_plate/google_16k/textured.obj",
+          "required_files": [
+            "029_plate/google_16k/textured.obj",
+            "029_plate/google_16k/textured.mtl",
+            "029_plate/google_16k/texture_map.png"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "dataset_convention_requires_dimension_check",
+          "physics": {
+            "mass_kg": 0.279,
+            "mass_status": "published_reference_object",
+            "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "concavity_preserving",
+            "status": "not_authored"
+          },
+          "competition_match": "generic_category_example"
+        }
+      ]
+    },
+    {
+      "id": "ycb_030_fork",
+      "source": {
+        "dataset": "YCB",
+        "page": "https://ycb-benchmarks.s3.amazonaws.com/index.html",
+        "url": "https://ycb-benchmarks.s3.amazonaws.com/data/google/030_fork_google_16k.tgz",
+        "archive": "tar.gz",
+        "sha256": "6e0ccafeaeb7c1ca112b3b523e9050a9aa22e98a35845ad0964b6ea42f6505a4",
+        "license": "CC-BY-4.0",
+        "attribution": "Berk Calli, Arjun Singh, Aaron Walsman, Siddhartha Srinivasa, Pieter Abbeel, Aaron Dollar; YCB Object and Model Set",
+        "archive_bytes": 4361138
+      },
+      "objects": [
+        {
+          "id": "030_fork",
+          "label_zh": "叉",
+          "category": "cutlery",
+          "visual_mesh": "030_fork/google_16k/textured.obj",
+          "required_files": [
+            "030_fork/google_16k/textured.obj",
+            "030_fork/google_16k/textured.mtl",
+            "030_fork/google_16k/texture_map.png"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "dataset_convention_requires_dimension_check",
+          "physics": {
+            "mass_kg": 0.034,
+            "mass_status": "published_reference_object",
+            "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "thin_compound",
+            "status": "not_authored"
+          },
+          "competition_match": "generic_category_example"
+        }
+      ]
+    },
+    {
+      "id": "ycb_031_spoon",
+      "source": {
+        "dataset": "YCB",
+        "page": "https://ycb-benchmarks.s3.amazonaws.com/index.html",
+        "url": "https://ycb-benchmarks.s3.amazonaws.com/data/google/031_spoon_google_16k.tgz",
+        "archive": "tar.gz",
+        "sha256": "cb1b73e9fcd2d40076ac051d954c2979fc7dedc988a7ff3434159d7db93b2de8",
+        "license": "CC-BY-4.0",
+        "attribution": "Berk Calli, Arjun Singh, Aaron Walsman, Siddhartha Srinivasa, Pieter Abbeel, Aaron Dollar; YCB Object and Model Set",
+        "archive_bytes": 4515365
+      },
+      "objects": [
+        {
+          "id": "031_spoon",
+          "label_zh": "勺",
+          "category": "cutlery",
+          "visual_mesh": "031_spoon/google_16k/textured.obj",
+          "required_files": [
+            "031_spoon/google_16k/textured.obj",
+            "031_spoon/google_16k/textured.mtl",
+            "031_spoon/google_16k/texture_map.png"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "dataset_convention_requires_dimension_check",
+          "physics": {
+            "mass_kg": 0.03,
+            "mass_status": "published_reference_object",
+            "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "thin_compound",
+            "status": "not_authored"
+          },
+          "competition_match": "generic_category_example"
+        }
+      ]
+    },
+    {
+      "id": "ycb_032_knife",
+      "source": {
+        "dataset": "YCB",
+        "page": "https://ycb-benchmarks.s3.amazonaws.com/index.html",
+        "url": "https://ycb-benchmarks.s3.amazonaws.com/data/google/032_knife_google_16k.tgz",
+        "archive": "tar.gz",
+        "sha256": "d169640d6bb61945c43a02f3966b617d273044f78892d8ab6c0e1d6e69e09f94",
+        "license": "CC-BY-4.0",
+        "attribution": "Berk Calli, Arjun Singh, Aaron Walsman, Siddhartha Srinivasa, Pieter Abbeel, Aaron Dollar; YCB Object and Model Set",
+        "archive_bytes": 4172608
+      },
+      "objects": [
+        {
+          "id": "032_knife",
+          "label_zh": "餐刀",
+          "category": "cutlery",
+          "visual_mesh": "032_knife/google_16k/textured.obj",
+          "required_files": [
+            "032_knife/google_16k/textured.obj",
+            "032_knife/google_16k/textured.mtl",
+            "032_knife/google_16k/texture_map.png"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "dataset_convention_requires_dimension_check",
+          "physics": {
+            "mass_kg": 0.031,
+            "mass_status": "published_reference_object",
+            "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "thin_compound",
+            "status": "not_authored"
+          },
+          "competition_match": "generic_category_example"
+        }
+      ]
+    },
+    {
+      "id": "ycb_036_wood_block",
+      "source": {
+        "dataset": "YCB",
+        "page": "https://ycb-benchmarks.s3.amazonaws.com/index.html",
+        "url": "https://ycb-benchmarks.s3.amazonaws.com/data/google/036_wood_block_google_16k.tgz",
+        "archive": "tar.gz",
+        "sha256": "df2d86634812e5d3aeecfbfc18f134921538c0093176eaa8247524ea0e684075",
+        "license": "CC-BY-4.0",
+        "attribution": "Berk Calli, Arjun Singh, Aaron Walsman, Siddhartha Srinivasa, Pieter Abbeel, Aaron Dollar; YCB Object and Model Set",
+        "archive_bytes": 11493368
+      },
+      "objects": [
+        {
+          "id": "036_wood_block",
+          "label_zh": "木块",
+          "category": "household",
+          "visual_mesh": "036_wood_block/google_16k/textured.obj",
+          "required_files": [
+            "036_wood_block/google_16k/textured.obj",
+            "036_wood_block/google_16k/textured.mtl",
+            "036_wood_block/google_16k/texture_map.png"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "dataset_convention_requires_dimension_check",
+          "physics": {
+            "mass_kg": 0.729,
+            "mass_status": "published_reference_object",
+            "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "box",
+            "status": "not_authored"
+          },
+          "competition_match": "generic_category_example"
+        }
+      ]
+    },
+    {
+      "id": "ycb_037_scissors",
+      "source": {
+        "dataset": "YCB",
+        "page": "https://ycb-benchmarks.s3.amazonaws.com/index.html",
+        "url": "https://ycb-benchmarks.s3.amazonaws.com/data/google/037_scissors_google_16k.tgz",
+        "archive": "tar.gz",
+        "sha256": "a70d2be8fae0d79c398ffd360385c885eff32ac5eb608ff4f2ada4f585a994b8",
+        "license": "CC-BY-4.0",
+        "attribution": "Berk Calli, Arjun Singh, Aaron Walsman, Siddhartha Srinivasa, Pieter Abbeel, Aaron Dollar; YCB Object and Model Set",
+        "archive_bytes": 4725522
+      },
+      "objects": [
+        {
+          "id": "037_scissors",
+          "label_zh": "剪刀（固定闭合）",
+          "category": "household",
+          "visual_mesh": "037_scissors/google_16k/textured.obj",
+          "required_files": [
+            "037_scissors/google_16k/textured.obj",
+            "037_scissors/google_16k/textured.mtl",
+            "037_scissors/google_16k/texture_map.png"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "dataset_convention_requires_dimension_check",
+          "physics": {
+            "mass_kg": 0.082,
+            "mass_status": "published_reference_object",
+            "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "convex_decomposition",
+            "status": "not_authored"
+          },
+          "competition_match": "generic_category_example"
+        }
+      ]
+    },
+    {
+      "id": "ycb_040_large_marker",
+      "source": {
+        "dataset": "YCB",
+        "page": "https://ycb-benchmarks.s3.amazonaws.com/index.html",
+        "url": "https://ycb-benchmarks.s3.amazonaws.com/data/google/040_large_marker_google_16k.tgz",
+        "archive": "tar.gz",
+        "sha256": "393d956da5f6cfe50614829faf4755bdb786c7db95abc1488f3b60505b1e2740",
+        "license": "CC-BY-4.0",
+        "attribution": "Berk Calli, Arjun Singh, Aaron Walsman, Siddhartha Srinivasa, Pieter Abbeel, Aaron Dollar; YCB Object and Model Set",
+        "archive_bytes": 4902250
+      },
+      "objects": [
+        {
+          "id": "040_large_marker",
+          "label_zh": "马克笔",
+          "category": "household",
+          "visual_mesh": "040_large_marker/google_16k/textured.obj",
+          "required_files": [
+            "040_large_marker/google_16k/textured.obj",
+            "040_large_marker/google_16k/textured.mtl",
+            "040_large_marker/google_16k/texture_map.png"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "dataset_convention_requires_dimension_check",
+          "physics": {
+            "mass_kg": 0.0158,
+            "mass_status": "published_reference_object",
+            "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "capsule",
+            "status": "not_authored"
+          },
+          "competition_match": "generic_category_example"
+        }
+      ]
+    },
+    {
+      "id": "ycb_043_phillips_screwdriver",
+      "source": {
+        "dataset": "YCB",
+        "page": "https://ycb-benchmarks.s3.amazonaws.com/index.html",
+        "url": "https://ycb-benchmarks.s3.amazonaws.com/data/google/043_phillips_screwdriver_google_16k.tgz",
+        "archive": "tar.gz",
+        "sha256": "74db04d49c13cd7cb79a29dd4e25d497970cdaebecd78e34bd6263d8b281b26c",
+        "license": "CC-BY-4.0",
+        "attribution": "Berk Calli, Arjun Singh, Aaron Walsman, Siddhartha Srinivasa, Pieter Abbeel, Aaron Dollar; YCB Object and Model Set",
+        "archive_bytes": 5287317
+      },
+      "objects": [
+        {
+          "id": "043_phillips_screwdriver",
+          "label_zh": "十字螺丝刀",
+          "category": "household",
+          "visual_mesh": "043_phillips_screwdriver/google_16k/textured.obj",
+          "required_files": [
+            "043_phillips_screwdriver/google_16k/textured.obj",
+            "043_phillips_screwdriver/google_16k/textured.mtl",
+            "043_phillips_screwdriver/google_16k/texture_map.png"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "dataset_convention_requires_dimension_check",
+          "physics": {
+            "mass_kg": 0.097,
+            "mass_status": "published_reference_object",
+            "mass_source": "https://people.eecs.berkeley.edu/~pabbeel/papers/2015-ICAR-YCB-object-set.pdf",
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "compound",
+            "status": "not_authored"
+          },
+          "competition_match": "generic_category_example"
+        }
+      ]
+    },
+    {
+      "id": "gso_Vans_Cereal_Honey_Nut_Crunch_11_oz_box",
+      "source": {
+        "dataset": "Google Scanned Objects",
+        "page": "https://app.gazebosim.org/GoogleResearch/fuel/models/Vans_Cereal_Honey_Nut_Crunch_11_oz_box",
+        "metadata_url": "https://fuel.gazebosim.org/1.0/GoogleResearch/models/Vans_Cereal_Honey_Nut_Crunch_11_oz_box",
+        "url": "https://fuel.gazebosim.org/1.0/GoogleResearch/models/Vans_Cereal_Honey_Nut_Crunch_11_oz_box/1/Vans_Cereal_Honey_Nut_Crunch_11_oz_box.zip",
+        "version": "1",
+        "archive": "zip",
+        "sha256": "31a5acdad9f8f05b186a8430d09982e5f156a02846eb9fa2b7f69ffb78d0ad1d",
+        "license": "CC-BY-4.0",
+        "attribution": "Google LLC; Google Scanned Objects; hosted by Open Robotics",
+        "archive_bytes": 11570400
+      },
+      "objects": [
+        {
+          "id": "gso_Vans_Cereal_Honey_Nut_Crunch_11_oz_box",
+          "label_zh": "麦片盒",
+          "category": "food_packaging",
+          "visual_mesh": "meshes/model.obj",
+          "required_files": [
+            "meshes/model.obj",
+            "meshes/model.mtl",
+            "materials/textures/texture.png",
+            "model.sdf",
+            "model.config",
+            "metadata.pbtxt"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "sdf_meter_convention_requires_dimension_check",
+          "physics": {
+            "mass_kg": null,
+            "mass_status": "absent_in_downloaded_sdf_and_metadata",
+            "mass_source": null,
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "box",
+            "status": "not_authored"
+          },
+          "competition_match": "generic_category_example",
+          "texture_remap": {
+            "texture.png": "materials/textures/texture.png"
+          }
+        }
+      ]
+    },
+    {
+      "id": "gso_Threshold_Bead_Cereal_Bowl_White",
+      "source": {
+        "dataset": "Google Scanned Objects",
+        "page": "https://app.gazebosim.org/GoogleResearch/fuel/models/Threshold_Bead_Cereal_Bowl_White",
+        "metadata_url": "https://fuel.gazebosim.org/1.0/GoogleResearch/models/Threshold_Bead_Cereal_Bowl_White",
+        "url": "https://fuel.gazebosim.org/1.0/GoogleResearch/models/Threshold_Bead_Cereal_Bowl_White/1/Threshold_Bead_Cereal_Bowl_White.zip",
+        "version": "1",
+        "archive": "zip",
+        "sha256": "dbc667d1373cc7e4252bcdd21feab246f17794d17ebce3a2693568a6ea197379",
+        "license": "CC-BY-4.0",
+        "attribution": "Google LLC; Google Scanned Objects; hosted by Open Robotics",
+        "archive_bytes": 4207853
+      },
+      "objects": [
+        {
+          "id": "gso_Threshold_Bead_Cereal_Bowl_White",
+          "label_zh": "白色陶瓷碗",
+          "category": "tableware",
+          "visual_mesh": "meshes/model.obj",
+          "required_files": [
+            "meshes/model.obj",
+            "meshes/model.mtl",
+            "materials/textures/texture.png",
+            "model.sdf",
+            "model.config",
+            "metadata.pbtxt"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "sdf_meter_convention_requires_dimension_check",
+          "physics": {
+            "mass_kg": null,
+            "mass_status": "absent_in_downloaded_sdf_and_metadata",
+            "mass_source": null,
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "concavity_preserving",
+            "status": "not_authored"
+          },
+          "competition_match": "generic_category_example",
+          "texture_remap": {
+            "texture.png": "materials/textures/texture.png"
+          }
+        }
+      ]
+    },
+    {
+      "id": "gso_Threshold_Porcelain_Coffee_Mug_All_Over_Bead_White",
+      "source": {
+        "dataset": "Google Scanned Objects",
+        "page": "https://app.gazebosim.org/GoogleResearch/fuel/models/Threshold_Porcelain_Coffee_Mug_All_Over_Bead_White",
+        "metadata_url": "https://fuel.gazebosim.org/1.0/GoogleResearch/models/Threshold_Porcelain_Coffee_Mug_All_Over_Bead_White",
+        "url": "https://fuel.gazebosim.org/1.0/GoogleResearch/models/Threshold_Porcelain_Coffee_Mug_All_Over_Bead_White/1/Threshold_Porcelain_Coffee_Mug_All_Over_Bead_White.zip",
+        "version": "1",
+        "archive": "zip",
+        "sha256": "dc34f175364540e239ae74f71e5b951a48aa99ccb48aaaf8c8c11771c5c56aa1",
+        "license": "CC-BY-4.0",
+        "attribution": "Google LLC; Google Scanned Objects; hosted by Open Robotics",
+        "archive_bytes": 3048630
+      },
+      "objects": [
+        {
+          "id": "gso_Threshold_Porcelain_Coffee_Mug_All_Over_Bead_White",
+          "label_zh": "白色陶瓷马克杯",
+          "category": "tableware",
+          "visual_mesh": "meshes/model.obj",
+          "required_files": [
+            "meshes/model.obj",
+            "meshes/model.mtl",
+            "materials/textures/texture.png",
+            "model.sdf",
+            "model.config",
+            "metadata.pbtxt"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "sdf_meter_convention_requires_dimension_check",
+          "physics": {
+            "mass_kg": null,
+            "mass_status": "absent_in_downloaded_sdf_and_metadata",
+            "mass_source": null,
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "concavity_preserving",
+            "status": "not_authored"
+          },
+          "competition_match": "generic_category_example",
+          "texture_remap": {
+            "texture.png": "materials/textures/texture.png"
+          }
+        }
+      ]
+    },
+    {
+      "id": "gso_Threshold_Dinner_Plate_Square_Rim_White_Porcelain",
+      "source": {
+        "dataset": "Google Scanned Objects",
+        "page": "https://app.gazebosim.org/GoogleResearch/fuel/models/Threshold_Dinner_Plate_Square_Rim_White_Porcelain",
+        "metadata_url": "https://fuel.gazebosim.org/1.0/GoogleResearch/models/Threshold_Dinner_Plate_Square_Rim_White_Porcelain",
+        "url": "https://fuel.gazebosim.org/1.0/GoogleResearch/models/Threshold_Dinner_Plate_Square_Rim_White_Porcelain/1/Threshold_Dinner_Plate_Square_Rim_White_Porcelain.zip",
+        "version": "1",
+        "archive": "zip",
+        "sha256": "e1dc5305e0651550f2d01cef1c390914c93849e2a44a2299f6db21d5208d6448",
+        "license": "CC-BY-4.0",
+        "attribution": "Google LLC; Google Scanned Objects; hosted by Open Robotics",
+        "archive_bytes": 3476449
+      },
+      "objects": [
+        {
+          "id": "gso_Threshold_Dinner_Plate_Square_Rim_White_Porcelain",
+          "label_zh": "白色方边陶瓷盘",
+          "category": "tableware",
+          "visual_mesh": "meshes/model.obj",
+          "required_files": [
+            "meshes/model.obj",
+            "meshes/model.mtl",
+            "materials/textures/texture.png",
+            "model.sdf",
+            "model.config",
+            "metadata.pbtxt"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "sdf_meter_convention_requires_dimension_check",
+          "physics": {
+            "mass_kg": null,
+            "mass_status": "absent_in_downloaded_sdf_and_metadata",
+            "mass_source": null,
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "concavity_preserving",
+            "status": "not_authored"
+          },
+          "competition_match": "generic_category_example",
+          "texture_remap": {
+            "texture.png": "materials/textures/texture.png"
+          }
+        }
+      ]
+    },
+    {
+      "id": "kenney_food_kit",
+      "source": {
+        "dataset": "Kenney Food Kit",
+        "page": "https://kenney.nl/assets/food-kit",
+        "url": "https://kenney.nl/media/pages/assets/food-kit/83086fa91c-1719418518/kenney_food-kit.zip",
+        "version": "2.0",
+        "archive": "zip",
+        "sha256": "cdad90853682499b94c9fda2f87678b24bfd8f3264e0ed323f6b6a27fd7c6f6f",
+        "archive_bytes": 4606270,
+        "license": "CC0-1.0",
+        "attribution": "Kenney (www.kenney.nl)"
+      },
+      "objects": [
+        {
+          "id": "kenney_carton",
+          "label_zh": "牛奶纸盒",
+          "category": "food_packaging",
+          "visual_mesh": "Models/OBJ format/carton.obj",
+          "required_files": [
+            "Models/OBJ format/carton.obj",
+            "Models/OBJ format/carton.mtl",
+            "Models/OBJ format/Textures/colormap.png",
+            "License.txt"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "artistic_units_not_calibrated",
+          "physics": {
+            "mass_kg": null,
+            "mass_status": "unknown",
+            "mass_source": null,
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "convex_hull",
+            "status": "not_authored"
+          },
+          "competition_match": "stylized_generic_placeholder"
+        },
+        {
+          "id": "kenney_carton_small",
+          "label_zh": "小牛奶纸盒",
+          "category": "food_packaging",
+          "visual_mesh": "Models/OBJ format/carton-small.obj",
+          "required_files": [
+            "Models/OBJ format/carton-small.obj",
+            "Models/OBJ format/carton-small.mtl",
+            "Models/OBJ format/Textures/colormap.png",
+            "License.txt"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "artistic_units_not_calibrated",
+          "physics": {
+            "mass_kg": null,
+            "mass_status": "unknown",
+            "mass_source": null,
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "convex_hull",
+            "status": "not_authored"
+          },
+          "competition_match": "stylized_generic_placeholder"
+        },
+        {
+          "id": "kenney_glass",
+          "label_zh": "无柄杯",
+          "category": "tableware",
+          "visual_mesh": "Models/OBJ format/glass.obj",
+          "required_files": [
+            "Models/OBJ format/glass.obj",
+            "Models/OBJ format/glass.mtl",
+            "Models/OBJ format/Textures/colormap.png",
+            "License.txt"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "artistic_units_not_calibrated",
+          "physics": {
+            "mass_kg": null,
+            "mass_status": "unknown",
+            "mass_source": null,
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "concavity_preserving",
+            "status": "not_authored"
+          },
+          "competition_match": "stylized_generic_placeholder"
+        },
+        {
+          "id": "kenney_cup",
+          "label_zh": "茶杯",
+          "category": "tableware",
+          "visual_mesh": "Models/OBJ format/cup.obj",
+          "required_files": [
+            "Models/OBJ format/cup.obj",
+            "Models/OBJ format/cup.mtl",
+            "Models/OBJ format/Textures/colormap.png",
+            "License.txt"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "artistic_units_not_calibrated",
+          "physics": {
+            "mass_kg": null,
+            "mass_status": "unknown",
+            "mass_source": null,
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "concavity_preserving",
+            "status": "not_authored"
+          },
+          "competition_match": "stylized_generic_placeholder"
+        },
+        {
+          "id": "kenney_mug",
+          "label_zh": "马克杯",
+          "category": "tableware",
+          "visual_mesh": "Models/OBJ format/mug.obj",
+          "required_files": [
+            "Models/OBJ format/mug.obj",
+            "Models/OBJ format/mug.mtl",
+            "Models/OBJ format/Textures/colormap.png",
+            "License.txt"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "artistic_units_not_calibrated",
+          "physics": {
+            "mass_kg": null,
+            "mass_status": "unknown",
+            "mass_source": null,
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "concavity_preserving",
+            "status": "not_authored"
+          },
+          "competition_match": "stylized_generic_placeholder"
+        },
+        {
+          "id": "kenney_bowl",
+          "label_zh": "碗",
+          "category": "tableware",
+          "visual_mesh": "Models/OBJ format/bowl.obj",
+          "required_files": [
+            "Models/OBJ format/bowl.obj",
+            "Models/OBJ format/bowl.mtl",
+            "Models/OBJ format/Textures/colormap.png",
+            "License.txt"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "artistic_units_not_calibrated",
+          "physics": {
+            "mass_kg": null,
+            "mass_status": "unknown",
+            "mass_source": null,
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "concavity_preserving",
+            "status": "not_authored"
+          },
+          "competition_match": "stylized_generic_placeholder"
+        },
+        {
+          "id": "kenney_plate",
+          "label_zh": "盘",
+          "category": "tableware",
+          "visual_mesh": "Models/OBJ format/plate.obj",
+          "required_files": [
+            "Models/OBJ format/plate.obj",
+            "Models/OBJ format/plate.mtl",
+            "Models/OBJ format/Textures/colormap.png",
+            "License.txt"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "artistic_units_not_calibrated",
+          "physics": {
+            "mass_kg": null,
+            "mass_status": "unknown",
+            "mass_source": null,
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "concavity_preserving",
+            "status": "not_authored"
+          },
+          "competition_match": "stylized_generic_placeholder"
+        },
+        {
+          "id": "kenney_soda_can",
+          "label_zh": "单个饮料罐",
+          "category": "drink",
+          "visual_mesh": "Models/OBJ format/soda-can.obj",
+          "required_files": [
+            "Models/OBJ format/soda-can.obj",
+            "Models/OBJ format/soda-can.mtl",
+            "Models/OBJ format/Textures/colormap.png",
+            "License.txt"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "artistic_units_not_calibrated",
+          "physics": {
+            "mass_kg": null,
+            "mass_status": "unknown",
+            "mass_source": null,
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "cylinder",
+            "status": "not_authored"
+          },
+          "competition_match": "stylized_generic_placeholder"
+        },
+        {
+          "id": "kenney_soda_bottle",
+          "label_zh": "饮料瓶",
+          "category": "drink",
+          "visual_mesh": "Models/OBJ format/soda-bottle.obj",
+          "required_files": [
+            "Models/OBJ format/soda-bottle.obj",
+            "Models/OBJ format/soda-bottle.mtl",
+            "Models/OBJ format/Textures/colormap.png",
+            "License.txt"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "artistic_units_not_calibrated",
+          "physics": {
+            "mass_kg": null,
+            "mass_status": "unknown",
+            "mass_source": null,
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "convex_decomposition",
+            "status": "not_authored"
+          },
+          "competition_match": "stylized_generic_placeholder"
+        },
+        {
+          "id": "kenney_soda_can_crushed",
+          "label_zh": "压扁饮料罐",
+          "category": "litter",
+          "visual_mesh": "Models/OBJ format/soda-can-crushed.obj",
+          "required_files": [
+            "Models/OBJ format/soda-can-crushed.obj",
+            "Models/OBJ format/soda-can-crushed.mtl",
+            "Models/OBJ format/Textures/colormap.png",
+            "License.txt"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "artistic_units_not_calibrated",
+          "physics": {
+            "mass_kg": null,
+            "mass_status": "unknown",
+            "mass_source": null,
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "convex_decomposition",
+            "status": "not_authored"
+          },
+          "competition_match": "stylized_generic_placeholder"
+        },
+        {
+          "id": "kenney_can_open",
+          "label_zh": "开口罐",
+          "category": "litter",
+          "visual_mesh": "Models/OBJ format/can-open.obj",
+          "required_files": [
+            "Models/OBJ format/can-open.obj",
+            "Models/OBJ format/can-open.mtl",
+            "Models/OBJ format/Textures/colormap.png",
+            "License.txt"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "artistic_units_not_calibrated",
+          "physics": {
+            "mass_kg": null,
+            "mass_status": "unknown",
+            "mass_source": null,
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "concavity_preserving",
+            "status": "not_authored"
+          },
+          "competition_match": "stylized_generic_placeholder"
+        },
+        {
+          "id": "kenney_candy_bar_wrapper",
+          "label_zh": "糖果包装",
+          "category": "litter",
+          "visual_mesh": "Models/OBJ format/candy-bar-wrapper.obj",
+          "required_files": [
+            "Models/OBJ format/candy-bar-wrapper.obj",
+            "Models/OBJ format/candy-bar-wrapper.mtl",
+            "Models/OBJ format/Textures/colormap.png",
+            "License.txt"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "artistic_units_not_calibrated",
+          "physics": {
+            "mass_kg": null,
+            "mass_status": "unknown",
+            "mass_source": null,
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "thin_compound",
+            "status": "not_authored"
+          },
+          "competition_match": "stylized_generic_placeholder"
+        },
+        {
+          "id": "kenney_fish_bones",
+          "label_zh": "鱼骨形废弃物",
+          "category": "litter",
+          "visual_mesh": "Models/OBJ format/fish-bones.obj",
+          "required_files": [
+            "Models/OBJ format/fish-bones.obj",
+            "Models/OBJ format/fish-bones.mtl",
+            "Models/OBJ format/Textures/colormap.png",
+            "License.txt"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "artistic_units_not_calibrated",
+          "physics": {
+            "mass_kg": null,
+            "mass_status": "unknown",
+            "mass_source": null,
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "compound",
+            "status": "not_authored"
+          },
+          "competition_match": "stylized_generic_placeholder"
+        },
+        {
+          "id": "kenney_popsicle_stick",
+          "label_zh": "冰棍棒",
+          "category": "litter",
+          "visual_mesh": "Models/OBJ format/popsicle-stick.obj",
+          "required_files": [
+            "Models/OBJ format/popsicle-stick.obj",
+            "Models/OBJ format/popsicle-stick.mtl",
+            "Models/OBJ format/Textures/colormap.png",
+            "License.txt"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "artistic_units_not_calibrated",
+          "physics": {
+            "mass_kg": null,
+            "mass_status": "unknown",
+            "mass_source": null,
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "box",
+            "status": "not_authored"
+          },
+          "competition_match": "stylized_generic_placeholder"
+        },
+        {
+          "id": "kenney_burger",
+          "label_zh": "汉堡",
+          "category": "food",
+          "visual_mesh": "Models/OBJ format/burger.obj",
+          "required_files": [
+            "Models/OBJ format/burger.obj",
+            "Models/OBJ format/burger.mtl",
+            "Models/OBJ format/Textures/colormap.png",
+            "License.txt"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "artistic_units_not_calibrated",
+          "physics": {
+            "mass_kg": null,
+            "mass_status": "unknown",
+            "mass_source": null,
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "convex_decomposition",
+            "status": "not_authored"
+          },
+          "competition_match": "stylized_generic_placeholder"
+        },
+        {
+          "id": "kenney_sandwich",
+          "label_zh": "三明治",
+          "category": "food",
+          "visual_mesh": "Models/OBJ format/sandwich.obj",
+          "required_files": [
+            "Models/OBJ format/sandwich.obj",
+            "Models/OBJ format/sandwich.mtl",
+            "Models/OBJ format/Textures/colormap.png",
+            "License.txt"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "artistic_units_not_calibrated",
+          "physics": {
+            "mass_kg": null,
+            "mass_status": "unknown",
+            "mass_source": null,
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "convex_hull",
+            "status": "not_authored"
+          },
+          "competition_match": "stylized_generic_placeholder"
+        },
+        {
+          "id": "kenney_rice_ball",
+          "label_zh": "饭团",
+          "category": "food",
+          "visual_mesh": "Models/OBJ format/rice-ball.obj",
+          "required_files": [
+            "Models/OBJ format/rice-ball.obj",
+            "Models/OBJ format/rice-ball.mtl",
+            "Models/OBJ format/Textures/colormap.png",
+            "License.txt"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "artistic_units_not_calibrated",
+          "physics": {
+            "mass_kg": null,
+            "mass_status": "unknown",
+            "mass_source": null,
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "convex_hull",
+            "status": "not_authored"
+          },
+          "competition_match": "stylized_generic_placeholder"
+        },
+        {
+          "id": "kenney_sushi_salmon",
+          "label_zh": "三文鱼寿司",
+          "category": "food",
+          "visual_mesh": "Models/OBJ format/sushi-salmon.obj",
+          "required_files": [
+            "Models/OBJ format/sushi-salmon.obj",
+            "Models/OBJ format/sushi-salmon.mtl",
+            "Models/OBJ format/Textures/colormap.png",
+            "License.txt"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "artistic_units_not_calibrated",
+          "physics": {
+            "mass_kg": null,
+            "mass_status": "unknown",
+            "mass_source": null,
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "compound",
+            "status": "not_authored"
+          },
+          "competition_match": "stylized_generic_placeholder"
+        },
+        {
+          "id": "kenney_maki_salmon",
+          "label_zh": "寿司卷",
+          "category": "food",
+          "visual_mesh": "Models/OBJ format/maki-salmon.obj",
+          "required_files": [
+            "Models/OBJ format/maki-salmon.obj",
+            "Models/OBJ format/maki-salmon.mtl",
+            "Models/OBJ format/Textures/colormap.png",
+            "License.txt"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "artistic_units_not_calibrated",
+          "physics": {
+            "mass_kg": null,
+            "mass_status": "unknown",
+            "mass_source": null,
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "convex_hull",
+            "status": "not_authored"
+          },
+          "competition_match": "stylized_generic_placeholder"
+        },
+        {
+          "id": "kenney_banana",
+          "label_zh": "香蕉",
+          "category": "food",
+          "visual_mesh": "Models/OBJ format/banana.obj",
+          "required_files": [
+            "Models/OBJ format/banana.obj",
+            "Models/OBJ format/banana.mtl",
+            "Models/OBJ format/Textures/colormap.png",
+            "License.txt"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "artistic_units_not_calibrated",
+          "physics": {
+            "mass_kg": null,
+            "mass_status": "unknown",
+            "mass_source": null,
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "convex_decomposition",
+            "status": "not_authored"
+          },
+          "competition_match": "stylized_generic_placeholder"
+        },
+        {
+          "id": "kenney_apple",
+          "label_zh": "苹果",
+          "category": "food",
+          "visual_mesh": "Models/OBJ format/apple.obj",
+          "required_files": [
+            "Models/OBJ format/apple.obj",
+            "Models/OBJ format/apple.mtl",
+            "Models/OBJ format/Textures/colormap.png",
+            "License.txt"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "artistic_units_not_calibrated",
+          "physics": {
+            "mass_kg": null,
+            "mass_status": "unknown",
+            "mass_source": null,
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "convex_hull",
+            "status": "not_authored"
+          },
+          "competition_match": "stylized_generic_placeholder"
+        },
+        {
+          "id": "kenney_utensil_fork",
+          "label_zh": "叉",
+          "category": "cutlery",
+          "visual_mesh": "Models/OBJ format/utensil-fork.obj",
+          "required_files": [
+            "Models/OBJ format/utensil-fork.obj",
+            "Models/OBJ format/utensil-fork.mtl",
+            "Models/OBJ format/Textures/colormap.png",
+            "License.txt"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "artistic_units_not_calibrated",
+          "physics": {
+            "mass_kg": null,
+            "mass_status": "unknown",
+            "mass_source": null,
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "thin_compound",
+            "status": "not_authored"
+          },
+          "competition_match": "stylized_generic_placeholder"
+        },
+        {
+          "id": "kenney_utensil_knife",
+          "label_zh": "餐刀",
+          "category": "cutlery",
+          "visual_mesh": "Models/OBJ format/utensil-knife.obj",
+          "required_files": [
+            "Models/OBJ format/utensil-knife.obj",
+            "Models/OBJ format/utensil-knife.mtl",
+            "Models/OBJ format/Textures/colormap.png",
+            "License.txt"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "artistic_units_not_calibrated",
+          "physics": {
+            "mass_kg": null,
+            "mass_status": "unknown",
+            "mass_source": null,
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "thin_compound",
+            "status": "not_authored"
+          },
+          "competition_match": "stylized_generic_placeholder"
+        },
+        {
+          "id": "kenney_utensil_spoon",
+          "label_zh": "勺",
+          "category": "cutlery",
+          "visual_mesh": "Models/OBJ format/utensil-spoon.obj",
+          "required_files": [
+            "Models/OBJ format/utensil-spoon.obj",
+            "Models/OBJ format/utensil-spoon.mtl",
+            "Models/OBJ format/Textures/colormap.png",
+            "License.txt"
+          ],
+          "unit_scale_to_m": 1,
+          "unit_status": "artistic_units_not_calibrated",
+          "physics": {
+            "mass_kg": null,
+            "mass_status": "unknown",
+            "mass_source": null,
+            "center_of_mass_m": null,
+            "inertia_kg_m2": null,
+            "contact_material": null,
+            "collision_plan": "thin_compound",
+            "status": "not_authored"
+          },
+          "competition_match": "stylized_generic_placeholder"
+        }
+      ],
+      "include_paths": [
+        "License.txt",
+        "Models/OBJ format/Textures/colormap.png",
+        "Models/OBJ format/carton.obj",
+        "Models/OBJ format/carton.mtl",
+        "Previews/carton.png",
+        "Models/OBJ format/carton-small.obj",
+        "Models/OBJ format/carton-small.mtl",
+        "Previews/carton-small.png",
+        "Models/OBJ format/glass.obj",
+        "Models/OBJ format/glass.mtl",
+        "Previews/glass.png",
+        "Models/OBJ format/cup.obj",
+        "Models/OBJ format/cup.mtl",
+        "Previews/cup.png",
+        "Models/OBJ format/mug.obj",
+        "Models/OBJ format/mug.mtl",
+        "Previews/mug.png",
+        "Models/OBJ format/bowl.obj",
+        "Models/OBJ format/bowl.mtl",
+        "Previews/bowl.png",
+        "Models/OBJ format/plate.obj",
+        "Models/OBJ format/plate.mtl",
+        "Previews/plate.png",
+        "Models/OBJ format/soda-can.obj",
+        "Models/OBJ format/soda-can.mtl",
+        "Previews/soda-can.png",
+        "Models/OBJ format/soda-bottle.obj",
+        "Models/OBJ format/soda-bottle.mtl",
+        "Previews/soda-bottle.png",
+        "Models/OBJ format/soda-can-crushed.obj",
+        "Models/OBJ format/soda-can-crushed.mtl",
+        "Previews/soda-can-crushed.png",
+        "Models/OBJ format/can-open.obj",
+        "Models/OBJ format/can-open.mtl",
+        "Previews/can-open.png",
+        "Models/OBJ format/candy-bar-wrapper.obj",
+        "Models/OBJ format/candy-bar-wrapper.mtl",
+        "Previews/candy-bar-wrapper.png",
+        "Models/OBJ format/fish-bones.obj",
+        "Models/OBJ format/fish-bones.mtl",
+        "Previews/fish-bones.png",
+        "Models/OBJ format/popsicle-stick.obj",
+        "Models/OBJ format/popsicle-stick.mtl",
+        "Previews/popsicle-stick.png",
+        "Models/OBJ format/burger.obj",
+        "Models/OBJ format/burger.mtl",
+        "Previews/burger.png",
+        "Models/OBJ format/sandwich.obj",
+        "Models/OBJ format/sandwich.mtl",
+        "Previews/sandwich.png",
+        "Models/OBJ format/rice-ball.obj",
+        "Models/OBJ format/rice-ball.mtl",
+        "Previews/rice-ball.png",
+        "Models/OBJ format/sushi-salmon.obj",
+        "Models/OBJ format/sushi-salmon.mtl",
+        "Previews/sushi-salmon.png",
+        "Models/OBJ format/maki-salmon.obj",
+        "Models/OBJ format/maki-salmon.mtl",
+        "Previews/maki-salmon.png",
+        "Models/OBJ format/banana.obj",
+        "Models/OBJ format/banana.mtl",
+        "Previews/banana.png",
+        "Models/OBJ format/apple.obj",
+        "Models/OBJ format/apple.mtl",
+        "Previews/apple.png",
+        "Models/OBJ format/utensil-fork.obj",
+        "Models/OBJ format/utensil-fork.mtl",
+        "Previews/utensil-fork.png",
+        "Models/OBJ format/utensil-knife.obj",
+        "Models/OBJ format/utensil-knife.mtl",
+        "Previews/utensil-knife.png",
+        "Models/OBJ format/utensil-spoon.obj",
+        "Models/OBJ format/utensil-spoon.mtl",
+        "Previews/utensil-spoon.png"
+      ]
+    }
+  ],
+  "pending": [
+    {
+      "id": "competition_specific_variants",
+      "reason_zh": "待对应比赛实物或官方具体清单补充尺寸、品牌、颜色和形态；现有模型均非经确认的比赛专用模型。"
+    },
+    {
+      "id": "photoreal_milk_and_drinks",
+      "reason_zh": "已有 Kenney 简化牛奶盒和饮料；写实版本继续寻找。CGTrader CC0 Milk Carton 标题与平台许可字段冲突，暂不纳入下载。",
+      "candidate_url": "https://www.cgtrader.com/free-3d-models/food/beverage/milk-carton-fb4f5ab1-c7a9-44bc-9795-e2f85e428fbc"
+    },
+    {
+      "id": "paper_litter",
+      "reason_zh": "已有压扁罐、包装等简化垃圾模型，纸团等具体形态仍需收集。"
+    }
+  ]
+}

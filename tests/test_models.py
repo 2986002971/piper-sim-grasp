@@ -16,7 +16,7 @@ class ModelTests(unittest.TestCase):
             data=Path(temp)
             handeye=data/'handeye.yaml';handeye.write_text('fixture')
             args=Namespace(scene=None,offline=True,bracket=None,bracket_cookie_file=None,
-                           download_only=False,urdf_only=False,handeye=handeye,isaac_python=Path(sys.executable))
+                           download_only=False,urdf_only=False,camera_placement="mechanical",handeye=handeye,isaac_python=Path(sys.executable))
             def assembly(source,dest,*unused):
                 urdf=dest/'piper_x_d405.urdf';urdf.write_text('<robot/>');return urdf
             with patch.object(prepare,'fetch',return_value=data),patch.object(prepare,'fetch_bracket',return_value=None),\

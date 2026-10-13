@@ -1,9 +1,11 @@
-# 文档
+# 文档入口
 
-当前版本、端口和管理生命周期以[服务端部署](deployment.md)为准。
-客户端构建、Python页面服务和WebDriver工具见独立 `piper-stream-viewer` 仓库。
+- [架构](architecture.md)
+- [裸机部署](deployment.md)
+- [日常操作](operation.md)
+- [串流网络约束](streaming-network.md)
+- [资产管理](assets.md)
+- [排障](troubleshooting.md)
+- [验收状态](verification.md)
 
-- [部署](deployment.md)、[迁移与恢复](migration.md)、[排障](troubleshooting.md)。
-- [模型与坐标](../models/README.md)、[第三方声明](../THIRD_PARTY_NOTICES.md)。
-- [relay回退](../legacy/README.md)、[可选离线抓取工具](../simulation/README.md)。
-- [验证范围](verification.md)、[技术调查](history/streaming-investigation.md)、[五十次延迟短测](isaac-turn-latency-quick.md)。
+当前命令入口统一为根目录 [piper](../piper)。基础软件版本见 [config/versions.lock.json](../config/versions.lock.json)；外部主项目版本由开发者选择。

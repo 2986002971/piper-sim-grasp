@@ -1,174 +1,83 @@
-# 服务端部署
+# AutoDL 部署
 
-本文是当前安装、版本、端口、配置与管理生命周期的唯一来源。历史结论见 [调查记录](history/streaming-investigation.md)，迁移见 [migration](migration.md)。
-远端使用 Ubuntu、NVIDIA RTX GPU、Isaac Sim `6.1.0.0` / Python 3.12；管理机使用 Linux、Python ≥3.10、OpenSSH。
-远端不需要 Node 或 Viewer 源码。当前验证使用 RTX 4090；原有 4090/5090 结果是历史证据，不能替代新实例验收。
+## 输入与目标机器
 
-## 1. 数据盘与 Isaac
+目标为 Ubuntu 22.04、x86_64、RTX 4090。AutoDL 提供可工作的 NVIDIA 驱动；部署只安装 Toolkit，不安装或替换宿主驱动。创建 Isaac 环境需要镜像提供 Conda 或 Python 3.12。
 
-以下命令在远端执行。把安装环境、模型缓存和日志放到仓库外的数据盘；安装及临时 wheel 解包会占用数十 GB，先用 `df -h` 确认空间。
-示例假设仓库位于 `/root/autodl-tmp/piper-sim-grasp`，数据位于 `/root/autodl-tmp/piper-data`。换位置时同时更新私有配置。
+准备本仓库、完整七喜场景包、机器配置。抓取接入还需外部主项目目录和经过主项目审核的 ONNX、PT、类别表。主项目自行同步；允许未提交代码，不要求固定提交。网络安装不属于离线模式；场景包导入不需要访问模型网站。
 
-```bash
-apt-get update
-apt-get install -y --no-install-recommends build-essential curl ca-certificates openssl \
-  ffmpeg vulkan-tools libvulkan1 libsm6 libegl1 libxt6 iproute2 haproxy \
-  libevent-dev libsqlite3-dev libssl-dev pkg-config
-mkdir -p /root/autodl-tmp/piper-data/{pip-cache,pip-tmp,stream}
-export PIP_CACHE_DIR=/root/autodl-tmp/piper-data/pip-cache
-export TMPDIR=/root/autodl-tmp/piper-data/pip-tmp
-conda create -y -p /root/autodl-tmp/isaacsim-6.1-env python=3.12 pip
-/root/autodl-tmp/isaacsim-6.1-env/bin/python -m pip install \
-  'isaacsim[all,extscache]==6.1.0.0' --extra-index-url https://pypi.nvidia.com
-/root/autodl-tmp/isaacsim-6.1-env/bin/python -m pip install \
-  -r /root/autodl-tmp/piper-sim-grasp/models/requirements.txt
-```
+将 `config/machine.example.json` 复制到仓库外并设置 0600，填写服务器 `repo_path`、统一 `data_root`。基础使用保留 `main_project: null`。配置路径均指向服务器；仅 `export-client --output` 指向执行命令的管理机。
 
-`conda` 由当前 GPU 镜像提供；其他环境可用已安装的 Python 3.12 `-m venv` 创建同一路径。
-可选离线抓取工具还需要 PyTorch/NumPy、PyYAML、目标瓶体 USD 和外部拟合包，见 [simulation](../simulation/README.md)。
-日常串流不以这些研究工具为依赖。Isaac 和 NVIDIA EULA 适用；启动脚本沿用已接受许可的非交互启动环境。
+`isaac_env` 可省略，默认 `data_root/envs/isaac`。`vulkan_icd` 可显式指定已经核对的 ICD；Vulkan 不通过时先处理驱动／ICD，部署不会覆盖系统 ICD。
+
+## 首次部署
+
+从服务器上的仓库根目录执行：
 
 ```bash
-nvidia-smi
-ls -l /dev/nvidia*
-VK_ICD_FILENAMES=/etc/vulkan/icd.d/nvidia_icd.json vulkaninfo --summary
+bash deploy/bootstrap.sh /private/machine.json
+./piper --local --config /private/machine.json assets import /path/to/7up-v1.tar.gz
+./piper --local --config /private/machine.json build
+./piper --local --config /private/machine.json doctor
+./piper --local --config /private/machine.json check devices
 ```
 
-若容器 NVIDIA ICD 指向 GLX 且无头 Vulkan 初始化失败，在仓库外创建 EGL ICD：
+bootstrap 在缺少系统 Python 的裸镜像上先安装 Python 3，再调用同一个 deploy 入口；日后直接执行 `./piper --local --config /private/machine.json deploy`。Isaac 环境可使用镜像已有的 `/root/miniconda3/bin/python3.12` 创建，不依赖交互 shell 激活 Conda。
+
+安装与解包需数据盘空间。生成数据全部在 data_root：envs、sdk、assets、models、build、install、config、logs、reports、state、cache，以及抓取依赖安装记录 dependencies。重复安装使用包管理器和实际版本检查；失败日志保存在 logs、dependencies 或 sdk 下对应组件目录，修正原因后重跑对应命令。
+
+本轮两台机器的 Isaac 环境约占 26–30 GB，首次安装还需下载临时空间。安装脚本禁用 pip 的重复缓存，正常结束会清理本次临时目录；不要将大型下载放进 30 GB 系统盘。
+
+普通 PyPI 依赖默认使用清华 HTTPS 镜像 `https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple`，Isaac 专用 wheel 保留 NVIDIA 额外索引。地址按[清华镜像使用说明](https://mirrors.tuna.tsinghua.edu.cn/help/pypi/)配置。需要其他源时在机器配置填写 `pypi_index_url`；脚本只对本次安装传参，不改用户全局 pip 配置。
+
+系统 ROS 安装保留 APT／locale 备份和官方签名；依赖解析不允许移除软件包。当前镜像的 ICU 版本差异作为显式兼容分支处理，其他不匹配版本会报错。
+
+`piper` 和 ROS 工具使用系统 Python，Isaac 仅使用独立环境。版本清单固定 Isaac、TensorRT 等核心组件；Humble 的 APT 包从当前仓库解析，实际安装版本记录在 reports/installed-packages.tsv，Isaac Python 包版本记录在 reports/isaac-packages.json，不承诺逐字节重建旧 APT 快照。
+
+## 接入持续开发的主项目
+
+填写 `main_project` 为服务器上的 NankaiRoboCup2026 目录，并增加：
+
+```json
+"detector": {
+  "onnx": "/external/models/yolo11s-detect-480x640.onnx",
+  "source_pt": "/external/models/yolo11s.pt",
+  "classes": "/external/models/yolo11s-detect-classes.txt",
+  "license_reference": "NKU-RC2026-MODEL-LICENSE-007",
+  "exporter_version": "8.4.120"
+}
+```
+
+这些模型信息对应当前主项目的 manifest 生成器；主项目调整审核输入时更新外部模型配置，不绕过其校验。在服务器的仓库根目录依次执行：
 
 ```bash
-cat > /root/autodl-tmp/piper-data/nvidia-egl.json <<'JSON'
-{"file_format_version":"1.0.0","ICD":{"library_path":"libEGL_nvidia.so.0","api_version":"1.3.0"}}
-JSON
-VK_ICD_FILENAMES=/root/autodl-tmp/piper-data/nvidia-egl.json vulkaninfo --summary
+./piper --local --config /private/machine.json deploy
+./piper --local --config /private/machine.json build
+./piper --local --config /private/machine.json doctor
+./piper --local --config /private/machine.json check control
 ```
 
-验证成功后，把这个绝对路径写入 `isaac.env.VK_ICD_FILENAMES`。不要覆盖系统 ICD；`nvidia-smi` 的 CUDA 版本也不是安装的 Toolkit 版本。
+构建只选取接入所需包，build/install/log 均在仿真数据目录。Servo 原脚本按目录结构写输出，因此复制其构建材料到独立暂存目录后调用原脚本。主项目源码、现有构建目录不写入。
 
-## 2. NVENC、coturn、HAProxy
+4090 engine 在当前服务器从 ONNX 生成。缓存按模型内容、GPU、TensorRT 和生成器输入区分，manifest 用主项目工具生成。参与构建的文件哈希、提交号和工作区状态保存在 reports/main-build-inputs.json。修改主项目后显式重新 build；运行中的进程不自动热更新。
 
-```bash
-cd /root/autodl-tmp/piper-sim-grasp
-gcc -shared -fPIC -O2 -o /root/autodl-tmp/piper-data/stream/libnvenc_fix.so server/nvenc_ioctl_filter.c -ldl
-bash server/install-turn.sh /root/autodl-tmp/piper-data/turn
-/usr/sbin/haproxy -vv
-```
+M 的 `preview_only=true` 是现有节点的计算模式，输出经原 launch 接入 W，执行仍由 W 服务控制。
 
-coturn 固定 `4.18.0`，安装脚本校验源包 SHA-256，不注册系统 turnserver daemon。
-HAProxy 使用系统安装的可执行文件；若 apt 自动启用了默认 daemon，确认它没有占用本项目端口。
-NVENC 过滤器根据容器可见 GPU 设备节点过滤宿主机枚举，不能写死设备 minor；新实例仍要验证实际编码。
-原有 HAProxy 私有 wrapper 可以复用，但其运行库路径属于该实例；迁移优先使用系统包并记录实际版本。
+## 串流组件
 
-## 3. 模型、支架与首次生成
+将 `streaming.enabled` 设为 true，填写公网 host、信令和 TURN 转发端口，以及服务器私有凭据文件路径，再运行 deploy。凭据不存在时自动创建，不打印到终端。
 
-机械臂、100 mm 夹爪、D405 描述和网格来自 [AgileX 官方仓库](https://github.com/agilexrobotics/piper_isaac_sim)，固定提交和逐文件哈希在 [sources.lock.json](../models/sources.lock.json)。
-RealSense 的来源提交及许可证单独记录。仅下载需要的文件到仓库外，失败或校验不符会阻止场景启动。
+平台 TCP 转发：公网信令 → 容器 6006；公网 TURN → 容器 loopback 6008。HAProxy 从 6008 转到 coturn 的容器 IPv4:16010；coturn 到 Isaac 使用 UDP 47998。当前网络方式保持 TURN/TCP，Viewer 独立运行。
 
-**第一次下载 D405 官方支架需要登录语雀。** 打开 [官方模型页面](https://agilexsupport.yuque.com/staff-hso6mo/tetraz/km95una15ctk4b17?singleDoc)，
-登录并下载 `intel realsense D405标准相机支架.zip`，解出 `405相机支架.STEP`。
-官方附件内 STEP 已与原场景源文件核对为逐字节一致；ZIP/STEP 哈希、稳定附件地址均记录在 source lock 中。
-匿名附件请求会返回登录页；不要把登录页当作 ZIP，也不要把 Cookie、账户或临时签名地址提交到仓库。
+公网端口使用每台实例已有的映射，不要求开放公网 UDP，也不修改平台网络。HAProxy 的源地址绑定及其他约束见[串流网络约束](streaming-network.md)。
 
-```bash
-mkdir -p /root/autodl-tmp/piper-data/models/bracket
-cp '/path/to/405相机支架.STEP' /root/autodl-tmp/piper-data/models/bracket/d405_mount_source.step
-python3 - <<'PY'
-import hashlib
-from pathlib import Path
-p=Path('/root/autodl-tmp/piper-data/models/bracket/d405_mount_source.step')
-assert hashlib.sha256(p.read_bytes()).hexdigest() == '09e16217aae82f9f4c349b1a563d972f6b6164c7b178209bd0582149059fa02e'
-PY
-/root/autodl-tmp/isaacsim-6.1-env/bin/python -m pip install \
-  -r /root/autodl-tmp/piper-sim-grasp/models/requirements-step-conversion.txt
-```
+## 从旧部署迁移
 
-也可用 `models/prepare.py --data-dir … --download-only --bracket-cookie-file /private/cookies.txt` 下载官方支架；
-Cookie 文件须在仓库外、权限 0600，下载后自行删除。Cookie 不会写入 provenance。
-正常首次启动默认自动准备模型；支架无有效缓存且未能下载时明确提示并生成无支架场景。
-缓存有 STEP 时需要上述 OpenCascade 转换依赖。外部 `PIPER_BRACKET=/path/to/mount.step` 或 `.stl` 可以覆盖（网格按毫米处理，装配位姿仍是旧几何拟合估计）。
+旧 server/manage.py、两套 Isaac 启动器、relay 和旧研究脚本已移除，不提供兼容壳。
 
-预下载及离线生成：
+1. 正常停止旧栈，保留其目录与私有配置作为恢复副本。
+2. 从正确场景导出完整资产包，复制新的机器配置并填写当前路径和端口。
+3. 新源码和 data_root 使用独立目录部署、导入、构建、验收。
+4. 新入口通过后再切换日常管理命令并重新导出 Viewer 配置。
 
-```bash
-export OMNI_KIT_ACCEPT_EULA=YES OMNI_KIT_ALLOW_ROOT=1
-/root/autodl-tmp/isaacsim-6.1-env/bin/python models/prepare.py \
-  --data-dir /root/autodl-tmp/piper-data/models --download-only
-/root/autodl-tmp/isaacsim-6.1-env/bin/python models/prepare.py \
-  --data-dir /root/autodl-tmp/piper-data/models --offline
-```
-
-`--download-only` 不需要启动 Isaac。跨机器迁移整个 `sources/` 和 `bracket/` 缓存。
-生成目录按源文件、生成器、标定及支架哈希区分；发布前检查完整引用，成功的 USD 才写 `complete.json`，重用前逐文件校验哈希。
-手眼为注明来源的示例，可用 `PIPER_HANDEYE` 替换。几何和坐标检查不代表 D405 RGB-D 模拟传感器已接通。
-显式设置 `PIPER_SCENE_USD` 时直接验证并使用原完整 USD，无需重新下载或装配；payload/mesh 目录要完整。
-
-## 4. 配置与平台入口
-
-在平台建立 TCP 转发：公网信令端口 → 容器 `6006`；公网 TURN 端口 → 容器 loopback `6008`。
-HAProxy 在 loopback `6008` 接收平台连接，使用容器源地址连接 coturn 的 `CONTAINER_IPV4:16010`。
-浏览器与 coturn 间承载 TCP；coturn allocation 到同容器 Isaac 是 UDP `47998`，allocation 范围 `49152–49215`。
-没有媒体 SSH 隧道，也不使用 PROXY protocol 或 STUN 重写。
-
-将 [server.example.json](../config/server.example.json) 复制到管理机仓库外，设 0600：
-
-```bash
-umask 077
-mkdir -p /path/to/private
-cp config/server.example.json /path/to/private/server.json
-chmod 600 /path/to/private/server.json
-```
-
-更新 SSH、远端源码、Isaac 环境、数据盘及平台 host/port。用 `secrets.token_hex(16)`、`secrets.token_hex(32)` 在私有配置中生成 TURN 用户名/密码，避免打印完整配置。
-默认 `tcp_ingress: true`；TURN 不需要客户端 LAN、relay token 或证书。
-`turn.relay_ip` 可选，由远端网卡/路由检测；不得沿用旧容器地址。`STREAM_PUBLIC_IP` 由管理入口覆盖为检测地址。
-coturn 限制 peer 为同容器 IPv4，`no-udp` 关闭浏览器 UDP 监听，`no-tcp-relay` 禁止 peer TCP allocation；它们没有关闭 allocation 到 Isaac 的 UDP。
-allocation quota 为 4，不表示四个人可以同时控制同一个 Isaac。
-
-把服务端整个 checkout 上传远端；`server/` 和 `models/` 的相对层级要保留。管理机也持有服务端 checkout，使用 SSH 控制远端。
-
-## 5. 完整启停、状态与导出
-
-在 Linux 管理机执行：
-
-```bash
-python3 server/manage.py preflight --config /path/to/private/server.json
-python3 server/manage.py start --config /path/to/private/server.json
-```
-
-`start` 保持前台管理，不自行 daemonize。可用持久终端，或管理机用户服务：
-
-```bash
-systemd-run --user --unit=piper-turn --collect --working-directory="$PWD" \
-  /usr/bin/python3 "$PWD/server/manage.py" start --config /path/to/private/server.json
-journalctl --user -u piper-turn.service -n 30 --no-pager
-python3 server/manage.py status --config /path/to/private/server.json
-python3 server/manage.py export-client --config /path/to/private/server.json --output /path/to/private/client.json
-```
-
-预检要求待启动端口空闲，不在运行栈上重复执行。状态分别显示 `configuration_present`、`components_started`、`isaac_ready` 和 `manager_active`。
-配置在 Isaac 就绪前就能存在；`PIPER_ISAAC_READY` 表示场景/应用初始化完成，视频及控制仍须浏览器验收。
-导出只含信令、媒体和 ICE 配置；包括 TURN 凭据，须可信交付。它不含管理 SSH、服务器路径或 relay 私钥。
-配置副本不会随服务停止自动删除，也不是服务器就绪证明。实例地址或凭据变动后重新导出并交付。
-
-`raw_dir/run-*` 中有本轮 Isaac/coturn/HAProxy 日志，远端 `PIPER_STREAM_ROOT/model-prepare.log` 有模型准备日志。
-日志与原始浏览器数据都在仓库外。不要全局 `pkill`；用拥有 state/starttime 的管理入口正常停止：
-
-```bash
-python3 server/manage.py stop --config /path/to/private/server.json
-python3 server/manage.py status --config /path/to/private/server.json
-```
-
-停止或启动失败时先关闭 SSH stdin，remote worker 清理自己的进程组，再删本轮配置、runtime/state；保留历史私有日志。
-管理机锁防止同一个 `raw_dir` 重复启动；远端预检拒绝端口冲突。管理迁移仍须先由旧管理机正常停止，不能用多个 raw_dir 争用实例。
-
-## 6. 客户端、生命周期与验收
-
-客户端运行方式在独立 `piper-stream-viewer` 仓库的 README；仅 Python 本机页面服务与普通浏览器，无需管理 SSH、Node、TUN 或 Python 媒体转发。
-同一 Isaac 只交接一份活跃会话；旧客户端先断开，再连接新客户端。
-验收包括持续视频、实际远端键鼠响应、主动断开、重连、刷新、停止清理及 [relay 回退](../legacy/README.md)。
-历史延迟结论见 [短测](isaac-turn-latency-quick.md)，不等于长期可靠性保证。
-
-当前服务依赖 Linux 管理进程及 SSH，失联、管理进程退出或任一子进程退出会清理栈。远端 worker 固定 4500 秒（75 分钟）watchdog，
-HAProxy 空闲超时也是 75 分钟；systemd 不会取消 watchdog。用户临时 unit 不等同于开机自启或无人值守持久服务。
-页面是本机 HTTP、信令 WS、TURN 无 TLS；WebRTC DTLS/SRTP 不意味着所有入口都有 HTTPS/TLS。
-统一托管及 HTTPS/WSS 网关、鉴权、容器 supervisor、长期可靠性验收留作后续工作。
+不要搬旧 PID、锁、runtime 文件或 ARM build/install。旧的若干 data 目录不需要维持原名称。

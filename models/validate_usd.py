@@ -28,7 +28,7 @@ def validate(path):
         cache=UsdGeom.XformCache()
         relative=cache.GetLocalToWorldTransform(optical)*cache.GetLocalToWorldTransform(wrist).GetInverse()
         if max(abs(relative[j][i]-expected[i][j]) for i in range(4) for j in range(4))>1e-5:
-            raise ValueError('Imported USD optical transform differs from hand-eye calibration')
+            raise ValueError('Imported USD optical transform differs from assembly metadata')
     return {'layers':len(layers),'assets':len(assets),'meshes':meshes,'unresolved':0,'geometry_only':True}
 
 
