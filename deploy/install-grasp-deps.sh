@@ -4,6 +4,7 @@ set -eo pipefail
 source_root="${1:?Usage: install-grasp-deps.sh MAIN_SOURCE DATA_DIR}"
 data_root="${2:?Usage: install-grasp-deps.sh MAIN_SOURCE DATA_DIR}"
 servo_root="${3:?isolated Servo source root required}"
+repo_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 [[ $(dpkg --print-architecture) = amd64 ]] || { echo 'This deployment targets amd64.' >&2; exit 2; }
 [[ -f /opt/ros/humble/setup.bash ]] || { echo 'Install Humble first.' >&2; exit 2; }
 mkdir -p "$data_root/dependencies"
@@ -35,16 +36,9 @@ if grep -q '^Remv ' "$data_root/dependencies/base-dry-run.txt"; then
 fi
 apt-get install -y --no-remove --no-install-recommends "${base_packages[@]}"
 python3 "$servo_root/src/third_party/moveit_servo_reference/build_overlay.py" --prepare-only
-paths=(
-  "$source_root/src/nankai_robocup_interfaces"
-  "$source_root/src/perception/nankai_robocup_perception_interfaces"
-  "$source_root/src/perception/nankai_robocup_perception_core"
-  "$source_root/src/perception/nankai_robocup_object_perception"
-  "$source_root/src/nankai_robocup_visp_pbvs"
-  "$source_root/src/w_moveit_servo"
-  "$source_root/src/piper/piper_x_driver_cpp"
-  "$source_root/src/manipulation/nankai_robocup_grasp_geometry"
-  "$servo_root/build/servo_reference/src/moveit_servo")
+package_paths="$(python3 "$repo_root/deploy/main_project.py" "$source_root")"
+mapfile -t paths <<< "$package_paths"
+paths+=("$servo_root/build/servo_reference/src/moveit_servo")
 # Isaac provides the camera topics; the real-camera launch is not used.
 rosdep install --simulate --from-paths "${paths[@]}" --ignore-src --rosdistro humble \
   --skip-keys realsense2_camera -y > "$data_root/dependencies/rosdep-dry-run.txt"

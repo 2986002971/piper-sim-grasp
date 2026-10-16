@@ -1,6 +1,7 @@
 """Machine configuration shared by deployment and management (stdlib only)."""
 import json
 import os
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -22,9 +23,8 @@ def load(filename):
     if data == Path(value['repo_path']) or data.is_relative_to(Path(value['repo_path'])):
         raise ValueError('data_root must be outside the checkout')
     value.setdefault('isaac_env', str(data/'envs/isaac'))
-    value.setdefault('profile', '7up')
-    if value['profile'] != '7up':
-        raise ValueError('Only the reviewed 7up profile is currently supported')
+    if not isinstance(value.get('profile'), str) or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_-]*', value['profile']):
+        raise ValueError('Set profile explicitly to a name from config/profiles (letters, digits, _ or -)')
     value.setdefault('watchdog_seconds', 4500)
     if value['watchdog_seconds'] < 0:
         raise ValueError('watchdog_seconds must be >= 0')

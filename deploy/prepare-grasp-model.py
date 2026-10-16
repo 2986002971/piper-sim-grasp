@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
-"""Generate simulation-side model and ROS configurations from reviewed inputs."""
+"""Build the simulation-side ROS robot model from the existing main model."""
 import argparse
 import copy
 from itertools import combinations
-import json
 from pathlib import Path
 import subprocess
 import sys
+import tempfile
 import xml.etree.ElementTree as ET
+from urllib.parse import unquote, urlparse
 
 import numpy as np
 from scipy.spatial.transform import Rotation
@@ -24,15 +25,52 @@ def origin(element):
     return result
 
 
+def validate_robot_geometry(robot, assembly_urdf):
+    """Refuse mixing a ROS arm with a differently assembled USD source."""
+    assembly = ET.parse(assembly_urdf).getroot()
+    for joint in robot.findall('joint'):
+        name = joint.get('name')
+        other = assembly.find(f"joint[@name='{name}']")
+        if name in ('world_to_base_link', 'grasp_tcp_joint'):
+            continue
+        if other is None or joint.get('type') != other.get('type'):
+            raise ValueError(f'ROS/assembly joint differs: {name}')
+        for tag in ('parent', 'child', 'axis'):
+            left, right = joint.find(tag), other.find(tag)
+            if (left is None) != (right is None) or (left is not None and left.attrib != right.attrib):
+                raise ValueError(f'ROS/assembly {name} {tag} differs')
+        if not np.allclose(origin(joint), origin(other), atol=1e-9, rtol=0):
+            raise ValueError(f'ROS/assembly {name} origin differs')
+    for link in robot.findall('link'):
+        other = assembly.find(f"link[@name='{link.get('name')}']")
+        for tag in ('visual', 'collision'):
+            items = link.findall(tag)
+            peers = other.findall(tag) if other is not None else []
+            if len(items) != len(peers):
+                raise ValueError(f'ROS/assembly geometry differs: {link.get("name")}')
+            for item, peer in zip(items, peers):
+                mesh, counterpart = item.find('geometry/mesh'), peer.find('geometry/mesh')
+                if not np.allclose(origin(item), origin(peer), atol=1e-9, rtol=0):
+                    raise ValueError('ROS/assembly mesh origin differs')
+                if mesh is None or counterpart is None:
+                    raise ValueError('Expected official arm mesh geometry')
+                if mesh.get('scale', '1 1 1') != counterpart.get('scale', '1 1 1'):
+                    raise ValueError('ROS/assembly mesh scale differs')
+                source = Path(unquote(urlparse(mesh.get('filename')).path))
+                target = assembly_urdf.parent/counterpart.get('filename')
+                if source.read_bytes() != target.read_bytes():
+                    raise ValueError(f'ROS/assembly mesh differs: {link.get("name")}')
+
+
 def add_device_collisions(robot, semantic, assembly_urdf):
     assembly = ET.parse(assembly_urdf).getroot()
     parents = {j.find('child').get('link'): j for j in assembly.findall('joint')}
     for name in ('d405_link', 'd405_bracket'):
         pose, link = np.eye(4), name
-        while link != 'Link6':
+        while link != 'link6':
             joint = parents[link]
             if joint.get('type') != 'fixed':
-                raise ValueError('Camera assembly must be fixed to Link6')
+                raise ValueError('Camera assembly must be fixed to link6')
             pose = origin(joint) @ pose
             link = joint.find('parent').get('link')
         source = assembly.find(f"link[@name='{name}']")
@@ -71,6 +109,10 @@ def add_device_collisions(robot, semantic, assembly_urdf):
     for a, b in edges:
         for left in clusters[a]:
             for right in clusters[b]: exclusions[tuple(sorted((left, right)))] = 'Adjacent'
+    # Operator confirmed the real mount's clearance and mechanical constraint:
+    # this pair cannot contact during wrist rotation. Keep the bracket geometry
+    # and all its other collision checks; this exemption belongs to simulation.
+    exclusions[('link4', 'sim_d405_bracket')] = 'Never'
     for (a, b), reason in sorted(exclusions.items()):
         ET.SubElement(semantic, 'disable_collisions', link1=a, link2=b, reason=reason)
 
@@ -78,51 +120,27 @@ def add_device_collisions(robot, semantic, assembly_urdf):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--main-source', type=Path, required=True)
-    parser.add_argument('--data-dir', type=Path, required=True)
     parser.add_argument('--assembly-urdf', type=Path, required=True)
-    parser.add_argument('--scene-manifest', type=Path, required=True)
     parser.add_argument('--model-output', type=Path, required=True)
-    parser.add_argument('--profile', type=Path, required=True)
-    parser.add_argument('--engine-dir', type=Path, required=True)
     args = parser.parse_args()
-    profile = yaml.safe_load(args.profile.read_text())
-    main_source, data = args.main_source.resolve(), args.data_dir.resolve()
-    config = data/'config'
-    config.mkdir(parents=True, exist_ok=True)
+    main_source = args.main_source.resolve()
     pyagx = main_source/'src/piper/pyagxarm'
     driver = yaml.safe_load((pyagx/'config/w_servo.yaml').read_text())
     driver['/**']['ros__parameters']['gripper_max_width_m'] = .1
-    driver_file = config/'model-driver.yaml'
-    driver_file.write_text(yaml.safe_dump(driver, sort_keys=False))
     model = args.model_output.resolve()
-    subprocess.run([sys.executable, str(pyagx/'checks/prepare_w_model.py'),
-                    '--driver-file', str(driver_file), '--output', str(model)], check=True)
+    model.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix='model-driver-', dir=model.parent) as temporary:
+        driver_file = Path(temporary)/'driver.yaml'
+        driver_file.write_text(yaml.safe_dump(driver, sort_keys=False))
+        subprocess.run([sys.executable, str(pyagx/'checks/prepare_w_model.py'),
+                        '--driver-file', str(driver_file), '--output', str(model)], check=True)
     robot = ET.parse(model/'robot.urdf').getroot()
     semantic = ET.parse(model/'robot.srdf').getroot()
+    validate_robot_geometry(robot, args.assembly_urdf.resolve())
     add_device_collisions(robot, semantic, args.assembly_urdf.resolve())
     ET.ElementTree(robot).write(model/'robot.urdf', encoding='utf-8', xml_declaration=True)
     ET.ElementTree(semantic).write(model/'robot.srdf', encoding='utf-8', xml_declaration=True)
-    scene = json.loads(args.scene_manifest.read_text())
-    boxes = profile['scene_boxes']
-    (config/'scene.yaml').write_text(yaml.safe_dump({'boxes': boxes}, sort_keys=False))
-    geometry = main_source/'src/manipulation/nankai_robocup_grasp_geometry/config'
-    alignment = yaml.safe_load((geometry/'alignment.example.yaml').read_text())
-    alignment['source'].update(bottle_height=float(scene['bottle_dimensions_m'][2]),
-                               bottle_radius=profile['bottle_radius_m'],
-                               execution_timeout=profile['execution_timeout_s'])
-    alignment['w'].update(urdf_file=str(model/'robot.urdf'), srdf_file=str(model/'robot.srdf'),
-                          limits_file=str(model/'joint_limits.yaml'), scene_file=str(config/'scene.yaml'))
-    (config/'alignment.yaml').write_text(yaml.safe_dump(alignment, sort_keys=False))
-    detector = yaml.safe_load((geometry/'d405_yolo.yaml').read_text())
-    parameters = detector['object_detector']['ros__parameters']
-    assets = args.engine_dir.resolve()
-    parameters.update(engine_path=str(assets/'model.engine'),
-                      manifest_path=str(assets/'model.manifest.yaml'),
-                      class_labels_path=str(assets/'classes.txt'))
-    # Parameter-file node keys must include the launch namespace in Humble.
-    detector['/grasp_detection/object_detector'] = detector.pop('object_detector')
-    (config/'detector.yaml').write_text(yaml.safe_dump(detector, sort_keys=False))
-    print(config)
+    print(model)
 
 
 if __name__ == '__main__': main()

@@ -1,7 +1,11 @@
+# Server-side source inputs. Change these paths when relocating the assets.
+# The ROS URDF is reused as an ordinary file from the existing resource directory.
+scene_usd: /root/autodl-tmp/piper-model-cache/scenes/piper_7up_ros_assembly.usda
+robot_urdf: /root/piper-data/assembly-repair-20261014/ros-model/robot.urdf
+assembly_urdf: /root/autodl-tmp/piper-model-cache/generated/ac58cb922252a7b21f7fe4a5/piper_x_d405.urdf
 # Reviewed device and scene contract; gains are checks, never overrides.
 articulation_prim: ''
 camera_prim: ''
-align_kinematics_to_ros_model: true
 driver_namespace: /piper_l/standalone
 initial_joint_positions:
 - -0.423197
@@ -9,7 +13,7 @@ initial_joint_positions:
 - -1.37436
 - 1.24916
 - -0.17006
-- 1.88319
+- -0.7
 gripper_width_m: 0.1
 physics_hz: 100.0
 # USD angular gains 400 / 50 per degree become 400 / 50 * 180/pi in PhysX radians.
@@ -20,88 +24,37 @@ gripper_drive_damping: 50.0
 camera_hz: 30.0
 optical_frame: d405_color_optical_frame
 camera_mount:
-- -0.009151761490955
-- -0.083919291408042
-- 0.035616147945832
-- -0.1736517824
-- 2.319e-06
-- -1.32266e-05
-- 0.9848071173
+- -0.009281316530531155
+- -0.08170864073374424
+- 0.041171783909482146
+- -0.17325929509831106
+- 0.00014969786758348258
+- -0.0008532439719948161
+- 0.984875863359088
 bridge_command_topic: /isaac/piper/joint_command
 bridge_feedback_topic: /isaac/piper/joint_states
 rgb_topic: /camera/d405/color/image_raw
 depth_topic: /camera/d405/aligned_depth_to_color/image_raw
 camera_info_topic: /camera/d405/color/camera_info
 scene_boxes:
+# Manually approximated MoveIt obstacle in base_link; does not author USD.
+# One solid block encloses the tabletop and legs, matching real-world practice.
+# Retain table_top as the fixed base mounting-contact ID.
 - id: table_top
   size:
   - 0.9
   - 0.8
-  - 0.06
+  - 0.73
   position:
   - 0.25
   - 0
-  - -0.03
+  - -0.365
   quaternion:
   - 0
   - 0
   - 0
   - 1
-- id: table_leg_0
-  size:
-  - 0.05
-  - 0.05
-  - 0.7
-  position:
-  - -0.15
-  - -0.32
-  - -0.38
-  quaternion:
-  - 0
-  - 0
-  - 0
-  - 1
-- id: table_leg_1
-  size:
-  - 0.05
-  - 0.05
-  - 0.7
-  position:
-  - -0.15
-  - 0.32
-  - -0.38
-  quaternion:
-  - 0
-  - 0
-  - 0
-  - 1
-- id: table_leg_2
-  size:
-  - 0.05
-  - 0.05
-  - 0.7
-  position:
-  - 0.65
-  - -0.32
-  - -0.38
-  quaternion:
-  - 0
-  - 0
-  - 0
-  - 1
-- id: table_leg_3
-  size:
-  - 0.05
-  - 0.05
-  - 0.7
-  position:
-  - 0.65
-  - 0.32
-  - -0.38
-  quaternion:
-  - 0
-  - 0
-  - 0
-  - 1
+# Manually maintained perception priors; no target pose is supplied to perception.
+bottle_height_m: 0.235
 bottle_radius_m: 0.03656
 execution_timeout_s: 180.0

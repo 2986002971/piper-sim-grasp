@@ -89,8 +89,6 @@ def run(config, streaming=False):
     lock = (p['state']/'session.lock').open('a')
     try: fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
     except BlockingIOError: raise RuntimeError('A session or acceptance check is already active') from None
-    devices = p['config']/'devices.yaml'
-    if not devices.is_file(): raise FileNotFoundError('Run piper build before start: '+str(devices))
     directory = p['logs']/('session-'+time.strftime('%Y%m%d-%H%M%S')+'-'+str(os.getpid()))
     directory.mkdir()
     children, handles = [], []
@@ -98,7 +96,7 @@ def run(config, streaming=False):
     for sig in (signal.SIGINT, signal.SIGTERM): signal.signal(sig, lambda *_: done.set())
     state = dict(pid=os.getpid(), start=stamp(os.getpid()), log_directory=str(directory),
                  streaming=streaming, scene_ready=False, ros_devices_ready=False,
-                 stream_initialized=False, experiment_running=False)
+                 stream_initialized=False, experiment_running=False, profile=config['profile'])
     def spawn(name, command, env=None):
         log = (directory/(name+'.log')).open('w'); handles.append(log)
         proc = subprocess.Popen(command, stdout=log, stderr=subprocess.STDOUT,
@@ -115,7 +113,15 @@ def run(config, streaming=False):
     requests = p['state']/'experiment-request.json'
     requests.unlink(missing_ok=True)
     try:
+        from runtime.scene import prepare
+        configuration = directory/'config'
+        prepared = prepare(config, configuration)
+        devices = prepared['devices']
+        profile = prepared['profile']
+        state.update(scene_usd=profile['scene_usd'], configuration_directory=str(configuration))
         write_json(p['state']/'session.json', state, private=True)
+        print(f"Profile: {config['profile']} | USD: {profile['scene_usd']}", flush=True)
+        print('Runtime configuration: '+str(configuration), flush=True)
         if streaming:
             if not config.get('streaming', {}).get('enabled'):
                 raise ValueError('Enable and deploy streaming in machine configuration first')
@@ -164,8 +170,9 @@ def run(config, streaming=False):
                     state.pop('experiment_error', None)
                     state.pop('experiment_exit_code', None)
                     command = ['ros2', 'launch', 'nankai_sim_integration', 'experiment.launch.py',
-                               'alignment_config:='+str(p['config']/'alignment.yaml'),
-                               'detector_config:='+str(p['config']/'detector.yaml'),
+                               'alignment_config:='+str(prepared['alignment']),
+                               'detector_config:='+str(prepared['detector']),
+                               'driver_namespace:='+profile['driver_namespace'],
                                'output_dir:='+str(experiment_directory)]
                     # Experiments have their own lifetime; their exit does not close devices.
                     experiment_proc = spawn(experiment_name, ros_command(config, command, main=True), env)
@@ -190,6 +197,8 @@ def run(config, streaming=False):
 def experiment(config, action):
     state = status(config)
     if not state['manager_active']: raise RuntimeError('Start devices first')
+    if action == 'start' and state.get('profile') != config['profile']:
+        raise ValueError('Active profile is '+str(state.get('profile'))+'; stop/start the session to switch profiles')
     if action == 'start' and not state.get('ros_devices_ready'): raise RuntimeError('ROS devices are not ready')
     if action == 'start' and not config.get('main_project'): raise ValueError('main_project is not configured')
     write_json(paths(config)['state']/'experiment-request.json', {'action': action}, private=True)

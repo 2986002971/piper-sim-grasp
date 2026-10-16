@@ -13,7 +13,7 @@ app=SimulationApp({'headless':True,'active_gpu':0,'physics_gpu':0,'multi_gpu':Fa
 exit_code=0
 try:
     from isaacsim.core.utils.extensions import enable_extension
-    from pxr import Usd, UsdGeom, UsdLux, Sdf
+    from pxr import Usd, UsdGeom, UsdLux
     enable_extension('isaacsim.asset.importer.urdf')
     app.update()
     from isaacsim.asset.importer.urdf import URDFImporter, URDFImporterConfig
@@ -26,7 +26,6 @@ try:
     from pxr import UsdUtils
     def relative(layer, asset):
         if asset.startswith(str(urdf.parent)+'/'):
-            import os
             return os.path.relpath(asset,Path(layer.realPath).parent)
         return asset
     layers, _, missing=UsdUtils.ComputeAllDependencies(str(imported))

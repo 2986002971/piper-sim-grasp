@@ -94,10 +94,10 @@ def create_joint_graph(root, camera, config):
     cache = UsdGeom.XformCache()
     optical = camera.GetPrim().GetParent()
     wrist = optical
-    while wrist and wrist.GetName() != 'Link6':
+    while wrist and wrist.GetName() != 'link6':
         wrist = wrist.GetParent()
     if not wrist:
-        raise ValueError('D405 optical frame must belong to Piper Link6')
+        raise ValueError('D405 optical frame must belong to Piper link6')
     mount = cache.GetLocalToWorldTransform(optical) * cache.GetLocalToWorldTransform(wrist).GetInverse()
     quaternion = mount.ExtractRotationQuat()
     rotation = [*map(float, quaternion.GetImaginary()), float(quaternion.GetReal())]
@@ -237,10 +237,8 @@ def main():
         if len(roots) != 1 or len(cameras) != 1:
             raise ValueError(f'Expected one Piper articulation and D405_RGB: {len(roots)}, {len(cameras)}')
         root, camera = roots[0], UsdGeom.Camera(cameras[0])
-        alignment = None
-        if config.get('align_kinematics_to_ros_model', False):
-            from align_ros_kinematics import align
-            alignment = align(stage, root, config['urdf_file'])
+        from validate_ros_kinematics import validate
+        kinematics = validate(stage, root, config['urdf_file'])
         with Usd.EditContext(stage, stage.GetSessionLayer()):
             physics_scenes = [p for p in stage.Traverse() if p.IsA(UsdPhysics.Scene)]
             if len(physics_scenes) > 1:
@@ -280,7 +278,7 @@ def main():
             dict(scene_usd=config['scene_usd'], articulation_prim=str(root.GetPath()),
                  camera_prim=str(camera.GetPath()), lens=lens, mount=mount,
                  physics_scene=physics_path,
-                 calibration_points_optical_m=points, kinematic_alignment=alignment,
+                 calibration_points_optical_m=points, kinematic_validation=kinematics,
                  drive_stiffness=kps[indices].tolist(), drive_damping=kds[indices].tolist()), indent=2)+'\n')
         print('PIPER_ISAAC_READY', flush=True)
         if args.stream: print('PIPER_STREAM_INITIALIZED', flush=True)

@@ -19,15 +19,8 @@ python3 "$servo_root/src/third_party/moveit_servo_reference/build_overlay.py"
 mkdir -p "$data_root/install"
 ln -sfn "$servo_root/install/servo_reference" "$data_root/install/servo"
 source "$(readlink -f "$data_root/install/servo")/local_setup.bash"
-paths=(
-  "$source_root/src/nankai_robocup_interfaces"
-  "$source_root/src/perception/nankai_robocup_perception_interfaces"
-  "$source_root/src/perception/nankai_robocup_perception_core"
-  "$source_root/src/perception/nankai_robocup_object_perception"
-  "$source_root/src/nankai_robocup_visp_pbvs"
-  "$source_root/src/w_moveit_servo"
-  "$source_root/src/piper/piper_x_driver_cpp"
-  "$source_root/src/manipulation/nankai_robocup_grasp_geometry")
+package_paths="$(python3 "$repo_root/deploy/main_project.py" "$source_root")"
+mapfile -t paths <<< "$package_paths"
 colcon --log-base "$data_root/logs/main-build" build --base-paths "${paths[@]}" \
   --build-base "$data_root/build/main" --install-base "$data_root/install/main" \
   --symlink-install --parallel-workers 2 --event-handlers console_cohesion+ \

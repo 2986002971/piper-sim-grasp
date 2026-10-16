@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Relocatable scene bundles. Export uses Isaac's OpenUSD; import is stdlib-only."""
+"""Optional offline scene export with relative paths and a dependency manifest."""
 import argparse
 import hashlib
 import json
@@ -34,26 +34,26 @@ def verify(root):
     return manifest
 
 
-def import_bundle(archive, destination):
-    destination = Path(destination)
-    destination.mkdir(parents=True, exist_ok=True)
-    identity = digest(archive)
-    target = destination/identity[:20]
-    if not target.exists():
-        with tempfile.TemporaryDirectory(dir=destination, prefix='.import-') as work:
-            work = Path(work)
-            with tarfile.open(archive) as tar:
-                for member in tar.getmembers():
-                    if not (member.isfile() or member.isdir()) or not (work/member.name).resolve().is_relative_to(work):
-                        raise ValueError('Bundle contains an unsafe archive entry')
-                tar.extractall(work)
-            verify(work)
-            work.rename(target)
-    manifest = verify(target)
-    temporary = destination/'current.json.tmp'
-    temporary.write_text(json.dumps({'directory': target.name, 'sha256': identity})+'\n')
-    temporary.replace(destination/'current.json')
-    return target, manifest
+def material_paths(materials, output):
+    """Keep custom MDL directories intact: USD cannot enumerate their imports.
+
+    A material directory is one dependency unit, including templates, textures
+    and notices. Preserve module filenames and relative paths instead of
+    prefixing individual MDL files with hashes.
+    """
+    parents = {Path(path).resolve().parent for path in materials}
+    roots = sorted(p for p in parents if not any(p != q and p.is_relative_to(q) for q in parents))
+    names = {}
+    for root in roots:
+        if Path(output).resolve().is_relative_to(root):
+            raise ValueError('Export output must be outside custom MDL directories: '+str(root))
+        prefix = 'materials/m_'+hashlib.sha256(str(root).encode()).hexdigest()[:16]
+        for path in sorted(root.rglob('*')):
+            if path.is_file():
+                if not path.resolve().is_relative_to(root):
+                    raise ValueError('Material dependency escapes its directory: '+str(path))
+                names[path.resolve()] = prefix+'/'+str(path.relative_to(root))
+    return names
 
 
 def export_bundle(scene, robot_urdf, assembly_urdf, scene_metadata, output):
@@ -66,7 +66,10 @@ def export_bundle(scene, robot_urdf, assembly_urdf, scene_metadata, output):
     search = [Path(p) for p in os.environ.get('PXR_AR_DEFAULT_SEARCH_PATH', '').split(':') if p]
     def builtin(path):
         p = Path(path)
-        return p.suffix == '.mdl' and any((folder/p.name).is_file() for folder in search)
+        if p.suffix != '.mdl': return False
+        if p.is_absolute():
+            return any(p.resolve().is_relative_to(folder.resolve()) for folder in search)
+        return any((folder/p).is_file() for folder in search)
     missing = [p for p in unresolved if not builtin(p)]
     if missing:
         raise ValueError(f'Unresolved scene assets: {missing}')
@@ -88,6 +91,7 @@ def export_bundle(scene, robot_urdf, assembly_urdf, scene_metadata, output):
             mesh.set('filename', str(path))
         trees[urdf] = tree
     names = {path: 'files/'+hashlib.sha256(str(path).encode()).hexdigest()[:16]+'-'+path.name for path in files}
+    names.update(material_paths([p for p in files if p.suffix == '.mdl'], output))
     names[scene] = 'scene.usda'
     output.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(dir=output.parent, prefix='.export-') as work:
@@ -100,18 +104,24 @@ def export_bundle(scene, robot_urdf, assembly_urdf, scene_metadata, output):
             target = Sdf.Layer.FindOrOpen(str(work/names[old]))
             def rewrite(value):
                 if not value: return value
-                if builtin(value): return Path(value).name
                 resolved = Path(Sdf.ComputeAssetPathRelativeToLayer(source, value)).resolve()
-                if resolved not in names:
-                    raise ValueError(f'Unbundled reference in {old}: {value}')
-                return os.path.relpath(work/names[resolved], (work/names[old]).parent)
+                if resolved in names:
+                    return os.path.relpath(work/names[resolved], (work/names[old]).parent)
+                if builtin(value): return Path(value).name
+                raise ValueError(f'Unbundled reference in {old}: {value}')
             UsdUtils.ModifyAssetPaths(target, rewrite)
             target.Save()
-        for source, name in ((robot_urdf, 'robot.urdf'), (assembly_urdf, 'assembly.urdf')):
-            tree = trees[source]
+        relocated_layers, relocated_assets, missing = UsdUtils.ComputeAllDependencies(str(work/'scene.usda'))
+        if missing:
+            raise ValueError(f'Exported scene has unresolved assets: {missing}')
+        for path in [layer.realPath for layer in relocated_layers]+list(relocated_assets):
+            if not Path(path).resolve().is_relative_to(work) and not builtin(path):
+                raise ValueError('Exported scene depends on an external file: '+str(path))
+        for tree in trees.values():
             for mesh in tree.iter('mesh'):
                 mesh.set('filename', names[Path(mesh.get('filename'))])
-            tree.write(work/name, encoding='utf-8', xml_declaration=True)
+        for source, name in ((robot_urdf, 'robot.urdf'), (assembly_urdf, 'assembly.urdf')):
+            trees[source].write(work/name, encoding='utf-8', xml_declaration=True)
         shutil.copy2(scene_metadata, work/'scene.json')
         notices = Path(__file__).resolve().parents[1]/'THIRD_PARTY_NOTICES.md'
         shutil.copy2(notices, work/notices.name)

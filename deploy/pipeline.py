@@ -86,38 +86,39 @@ def deploy(config):
     python_packages = subprocess.check_output([isaac/'bin/python','-m','pip','list','--format=json'], text=True)
     write_json(p['reports']/'isaac-packages.json', json.loads(python_packages))
     write_json(p['reports']/'deployment.json', {'completed': True, 'versions': lock, 'time': time.time()})
-    print('Deployment completed. Import a scene bundle, then run piper build.', flush=True)
+    print('Deployment completed. Prepare the source USD and URDF paths in your profile, then run piper build.', flush=True)
 
 
 def build(config):
-    from deploy.configure import configure
+    from runtime.scene import load_profile, model_directory, model_inputs
+    profile = load_profile(config)
     p = paths(config)
     if not Path('/opt/ros/humble/setup.bash').is_file(): raise RuntimeError('Run piper deploy first')
     log = p['logs']/'build.log'
     base = ['bash', ROOT/'runtime/ros2-env.sh']
     run(base+['colcon','--log-base',p['logs']/'devices-build','build','--base-paths',ROOT/'ros2/piper_sim_devices',
               '--build-base',p['build']/'devices','--install-base',p['install']/'devices','--symlink-install'],log)
-    devices, bundle, manifest = configure(config)
     if config.get('main_project'):
         source = Path(config['main_project']); before = inspect(source)
         servo = stage_servo(source, config['data_root'])
         run(base+['bash',ROOT/'deploy/build-grasp.sh',source,config['data_root'],servo],log)
         from deploy.engine import build_engine
         engine = build_engine(config, log)
-        model_dir = Path(config['data_root'])/'models/piper'
+        model_dir = model_directory(config)
         # The upstream generator intentionally refuses overwriting an output;
         # generate a new owned directory and publish after validation.
         staging = Path(config['data_root'])/'models'/('generation-'+str(time.time_ns()))
-        run(base+['python3',ROOT/'deploy/prepare-grasp-config.py','--main-source',source,
-                  '--data-dir',config['data_root'],'--model-output',staging,
-                  '--assembly-urdf',bundle/manifest['assembly_urdf'],
-                  '--scene-manifest',bundle/manifest['scene_metadata'],
-                  '--profile',ROOT/'config/profiles'/f"{config['profile']}.yaml",'--engine-dir',engine],log)
+        inputs = model_inputs(profile)
+        run(base+['python3',ROOT/'deploy/prepare-grasp-model.py','--main-source',source,
+                  '--model-output',staging,'--assembly-urdf',profile['assembly_urdf']],log)
+        if inputs != model_inputs(profile):
+            raise RuntimeError('Robot model inputs changed during build; rerun against stable inputs')
+        write_json(staging/'build.json', {'model_inputs': inputs, 'main_project': str(source.resolve()),
+                                        'engine_directory': str(engine.resolve())})
         if model_dir.is_symlink(): model_dir.unlink()
         elif model_dir.exists(): raise RuntimeError('Refusing to replace unmanaged model directory: '+str(model_dir))
         model_dir.symlink_to(staging.name)
-        configure(config, main=True)
         after = inspect(source)
         if before != after: raise RuntimeError('Main project changed during build; rerun against stable inputs')
         write_json(p['reports']/'main-build-inputs.json', before)
-    print('Build and configuration completed: '+str(devices), flush=True)
+    print(f"Build completed for profile {config['profile']}; start/check will prepare fresh runtime configuration.", flush=True)

@@ -1,54 +1,145 @@
 {
-  "repository": "https://github.com/agilexrobotics/piper_isaac_sim",
-  "commit": "8e1f88fdb7afca49c40e9a0c1c01cc588e86f0d2",
+  "repository": "https://github.com/agilexrobotics/agx_arm_urdf",
+  "commit": "f6642ce0d7872c686f29c99e9e10cd23d1d49313",
   "realsense_source": {
     "repository": "https://github.com/realsenseai/realsense-ros",
     "commit": "bafc21080c5c8e259dadbb309797949aee0dd950"
   },
   "files": [
     {
-      "path": "piper_x_description/meshes/dae/J1.dae",
-      "sha256": "e78dee99bc84857c09183463f3fb3fdea292ea7570f1bfb0001a79674bb69d45"
+      "path": "piper_x/meshes/link1.stl",
+      "sha256": "60c53c4d5d20c5b663cc4ced2f5e322d2a857baa6e79cef04a33b5f9f7c1e985",
+      "repository": "agilexrobotics/agx_arm_urdf"
     },
     {
-      "path": "piper_x_description/meshes/dae/J2.dae",
-      "sha256": "97e9079580af6e423317c33b2a0f4fe0f6dbc67c3e1d9e6f4836c87c6c8f34a2"
+      "path": "piper_x/meshes/gripper_link1.stl",
+      "sha256": "475a7d8db056524d7659fadf5a2c307d62791047b6214d733dfc7846ed1c613d",
+      "repository": "agilexrobotics/agx_arm_urdf"
     },
     {
-      "path": "piper_x_description/meshes/dae/J3.dae",
-      "sha256": "db5b39eef745655a67e57870d8ee56f26a03651d2161635ca2ec3c58c9269907"
+      "path": "piper_x/meshes/link6.stl",
+      "sha256": "8c391520fd963fe4f9b46afcde82ceeab2a93b73c01fc5debe039fe632f597e6",
+      "repository": "agilexrobotics/agx_arm_urdf"
     },
     {
-      "path": "piper_x_description/meshes/dae/J4.dae",
-      "sha256": "ccc08d3ef1cb8bdfb8ab5395ff65893d13386ad526d7bc954d468b7dc885d557"
+      "path": "piper_x/meshes/base_link.stl",
+      "sha256": "b732cf8a1f8435f51e3ec860f11189c3ec63744d3df008b7d3e9b6505dfc483d",
+      "repository": "agilexrobotics/agx_arm_urdf"
     },
     {
-      "path": "piper_x_description/meshes/dae/J5.dae",
-      "sha256": "78718679ffdf9d81130047c4267ed66a081315eff36f216833bc3781c6241417"
+      "path": "piper_x/meshes/gripper_link2.stl",
+      "sha256": "3f88d534a85e28a33ef7d2061adacbd1d25214aa9325f9e464aad0f9e4b74606",
+      "repository": "agilexrobotics/agx_arm_urdf"
     },
     {
-      "path": "piper_x_description/meshes/dae/J7.dae",
-      "sha256": "7534447abb248829c447a8e19d84c6fb3903ab70ebc32dfd164abcc4099fc74a"
+      "path": "piper_x/meshes/link5.stl",
+      "sha256": "fb7ab27270e6b5fa0b2e6df9fa37722062f4ff397cd4f89883d23551bedd0801",
+      "repository": "agilexrobotics/agx_arm_urdf"
     },
     {
-      "path": "piper_x_description/meshes/dae/J8.dae",
-      "sha256": "662d36ce7edf3e1cbb887302f4499a76aff75ccf1996730fa63f2a30f749adda"
+      "path": "piper_x/meshes/link2.stl",
+      "sha256": "0316b881cd0bae6c9f8f794fabdee7fbf041f83f2f75980d34b67555fe8a3561",
+      "repository": "agilexrobotics/agx_arm_urdf"
     },
     {
-      "path": "piper_x_description/meshes/dae/base_Link.dae",
-      "sha256": "7f2251dbce131f23e0c23a98bd4ef3fc6c071dbcbcfc8b6cb71350a0f4bff76c"
+      "path": "piper_x/meshes/gripper_base.stl",
+      "sha256": "0b839dc0bcb7d94e3422c74f6396b54a0441ba4836448ab5586e7f372d1bdbf3",
+      "repository": "agilexrobotics/agx_arm_urdf"
     },
     {
-      "path": "piper_x_description/meshes/dae/gripper_base_100_v2.dae",
-      "sha256": "b5dd490ade6a0fea939e43d490106d09f90a5de5e5bab55e2ff139925f2e47ab"
+      "path": "piper_x/meshes/link4.stl",
+      "sha256": "10b69bde5305c53fbb4a6dc4e910e8604d54d250a969e6cda8128d8244989831",
+      "repository": "agilexrobotics/agx_arm_urdf"
     },
     {
-      "path": "piper_x_description/package.xml",
-      "sha256": "cdb218bce0c6f1f8618fa537c38640d25984acd0dd9bf9aa590aa9b14e85a505"
+      "path": "piper_x/meshes/flange.stl",
+      "sha256": "f9ce752f93a6598858a779e3d8755a09e466b588efcffc3a1c3953773753a22b",
+      "repository": "agilexrobotics/agx_arm_urdf"
     },
     {
-      "path": "piper_x_description/urdf/piper_x_description.urdf",
-      "sha256": "7d4b9bcb49f9d337fa429a681c360af9a86a465ebd2d6d405aecfa0ddd7b20d8"
+      "path": "piper_x/meshes/link3.stl",
+      "sha256": "c51994fa4ca6a0577cfc65fe5a666ad47ad6af8dc98fbe81b71c4a7fe8ad09a5",
+      "repository": "agilexrobotics/agx_arm_urdf"
+    },
+    {
+      "path": "piper_x/meshes/dae/link6.dae",
+      "sha256": "7e6076e2574f042f5067dd431e96486249cffbc8ab292fb66cb68848ad5bab9a",
+      "repository": "agilexrobotics/agx_arm_urdf"
+    },
+    {
+      "path": "piper_x/meshes/dae/link4.dae",
+      "sha256": "cda6aab6dfefb13d5409a691d7486c4253737f114cca9ada67da36a10fb08123",
+      "repository": "agilexrobotics/agx_arm_urdf"
+    },
+    {
+      "path": "piper_x/meshes/dae/link1.dae",
+      "sha256": "6448c874d7106738d20cdd044e0e88f86262935f0bc3bdc072c5025bcf47ecfd",
+      "repository": "agilexrobotics/agx_arm_urdf"
+    },
+    {
+      "path": "piper_x/meshes/dae/link3.dae",
+      "sha256": "001b0b97dd514a9f8e6b321e12a8005d17198eb8b60ec443b9bd67251a3790ce",
+      "repository": "agilexrobotics/agx_arm_urdf"
+    },
+    {
+      "path": "piper_x/meshes/dae/link2.dae",
+      "sha256": "05ad1975346a330129dbce02131405dba6f51d74d0e5f3a70ec154ef219d9163",
+      "repository": "agilexrobotics/agx_arm_urdf"
+    },
+    {
+      "path": "piper_x/meshes/dae/base_link.dae",
+      "sha256": "706008b1e425227d42fb490febb6a54a2a294a39911b8cf4e9ca4b8c61eb42bd",
+      "repository": "agilexrobotics/agx_arm_urdf"
+    },
+    {
+      "path": "piper_x/meshes/dae/flange.dae",
+      "sha256": "421c3e20c6109df3c96c5ce18ff0b2609b6604135ff790e4bfc1d9a281b0701a",
+      "repository": "agilexrobotics/agx_arm_urdf"
+    },
+    {
+      "path": "piper_x/meshes/dae/gripper_base.dae",
+      "sha256": "aaea10ec06709d6a3343dd3378553eee3df40b43ee276df10c5b68ac7f61bae2",
+      "repository": "agilexrobotics/agx_arm_urdf"
+    },
+    {
+      "path": "piper_x/meshes/dae/gripper_link2.dae",
+      "sha256": "0da1350898b2787b76b84698253aeb1efd2ddb6360b2fa2ae03ecff389883af8",
+      "repository": "agilexrobotics/agx_arm_urdf"
+    },
+    {
+      "path": "piper_x/meshes/dae/link5.dae",
+      "sha256": "8c2a2da46dfe9d13fc8841a990694c77106c27be292fac4fc42a86cd78a2dee1",
+      "repository": "agilexrobotics/agx_arm_urdf"
+    },
+    {
+      "path": "piper_x/meshes/dae/gripper_link1.dae",
+      "sha256": "b4aaf0e024d09eb0454e70e0c5092638edcf7da7c253d1effdeeaec46f76427b",
+      "repository": "agilexrobotics/agx_arm_urdf"
+    },
+    {
+      "path": "piper_x/urdf/piper_x_description.urdf",
+      "sha256": "34126caac7d5b37bc2409f337ac246afbe0bb8cd47fc9f16df5038f19bd21e3a",
+      "repository": "agilexrobotics/agx_arm_urdf"
+    },
+    {
+      "path": "piper_x/urdf/piper_x_with_gripper_description.xacro",
+      "sha256": "0ee3f52f9acf3060a7f3e439c6e5e46b6a53d4fa509dd495045548be6b7f90cd",
+      "repository": "agilexrobotics/agx_arm_urdf"
+    },
+    {
+      "path": "LICENSE",
+      "sha256": "247944c63de1573653722ba784f96123da267105b7b48577e0c8826a24b809f6",
+      "repository": "agilexrobotics/agx_arm_urdf"
+    },
+    {
+      "path": "README.md",
+      "sha256": "be3b42a26d2ba27de082ddee511a6c511edb22add5d2e8e8436338e91fddee6a",
+      "repository": "agilexrobotics/agx_arm_urdf"
+    },
+    {
+      "path": "README_EN.md",
+      "sha256": "7af8b602985487ecc33c163284d6e6957077b3c06ea35920b36bab3b67cf0523",
+      "repository": "agilexrobotics/agx_arm_urdf"
     },
     {
       "path": "realsense2_description/LICENSE",
@@ -59,23 +150,33 @@
     },
     {
       "path": "realsense2_description/meshes/d405.stl",
-      "sha256": "a248f41149d12b28311829feecbe7a80cf1481fd05e0f5df2c4c7ecd556edd48"
+      "sha256": "a248f41149d12b28311829feecbe7a80cf1481fd05e0f5df2c4c7ecd556edd48",
+      "repository": "agilexrobotics/piper_isaac_sim",
+      "commit": "8e1f88fdb7afca49c40e9a0c1c01cc588e86f0d2"
     },
     {
       "path": "realsense2_description/package.xml",
-      "sha256": "73c0fe593f574dd3cea0e57378c437c2671d3fdb2db2d32341d599799ee2be59"
+      "sha256": "73c0fe593f574dd3cea0e57378c437c2671d3fdb2db2d32341d599799ee2be59",
+      "repository": "agilexrobotics/piper_isaac_sim",
+      "commit": "8e1f88fdb7afca49c40e9a0c1c01cc588e86f0d2"
     },
     {
       "path": "realsense2_description/urdf/_d405.urdf.xacro",
-      "sha256": "5a39829166a7d1a0a90b15afc6a3b074438bb990c9a53d6d2218dbe6848f9616"
+      "sha256": "5a39829166a7d1a0a90b15afc6a3b074438bb990c9a53d6d2218dbe6848f9616",
+      "repository": "agilexrobotics/piper_isaac_sim",
+      "commit": "8e1f88fdb7afca49c40e9a0c1c01cc588e86f0d2"
     },
     {
       "path": "realsense2_description/urdf/_materials.urdf.xacro",
-      "sha256": "11ad1502a90114a20f02f707744b84e001e6c1c1ba5026b2509bcbcd525e5d48"
+      "sha256": "11ad1502a90114a20f02f707744b84e001e6c1c1ba5026b2509bcbcd525e5d48",
+      "repository": "agilexrobotics/piper_isaac_sim",
+      "commit": "8e1f88fdb7afca49c40e9a0c1c01cc588e86f0d2"
     },
     {
       "path": "realsense2_description/urdf/_usb_plug.urdf.xacro",
-      "sha256": "63e6c96710eeecde1a6c981dd6d88f1958b4f0f6d50b80dd8c30a35f0a001732"
+      "sha256": "63e6c96710eeecde1a6c981dd6d88f1958b4f0f6d50b80dd8c30a35f0a001732",
+      "repository": "agilexrobotics/piper_isaac_sim",
+      "commit": "8e1f88fdb7afca49c40e9a0c1c01cc588e86f0d2"
     }
   ],
   "bracket": {
@@ -83,9 +184,9 @@
     "step_sha256": "09e16217aae82f9f4c349b1a563d972f6b6164c7b178209bd0582149059fa02e",
     "verified_attachment": true,
     "attachment_url": "https://agilexsupport.yuque.com/attachments/yuque/0/2026/zip/39017709/1773047321602-8185f707-a75f-4213-8e35-aaca5960b92e.zip",
-    "attachment_name": "intel realsense D405标准相机支架.zip",
+    "attachment_name": "intel realsense D405\u6807\u51c6\u76f8\u673a\u652f\u67b6.zip",
     "attachment_sha256": "682ad68b6ad0805eb123791b58006d1f6c90a3e770a54e6e562c6efcb83bd069",
-    "member": "405相机支架.STEP",
+    "member": "405\u76f8\u673a\u652f\u67b6.STEP",
     "requires_authentication": true
   }
 }

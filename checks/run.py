@@ -20,14 +20,16 @@ def check(config, level, streaming=False):
         try: fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
         except BlockingIOError: raise RuntimeError('Stop the device session before GPU acceptance') from None
         output = p['reports']/(level+'-'+str(time.time_ns()))
+        from runtime.scene import prepare
+        prepared = prepare(config, output/'config', main=level!='devices')
         if level == 'perception':
             command = ['python3',ROOT/'checks/check_sim_perception.py',
-                       '--devices-config',p['config']/'devices.yaml','--alignment-config',p['config']/'alignment.yaml',
-                       '--detector-config',p['config']/'detector.yaml','--output',output]
+                       '--devices-config',prepared['devices'],'--alignment-config',prepared['alignment'],
+                       '--detector-config',prepared['detector'],'--output',output]
         else:
-            command = ['python3',ROOT/'checks/check_sim_devices.py','--config',p['config']/'devices.yaml',
+            command = ['python3',ROOT/'checks/check_sim_devices.py','--config',prepared['devices'],
                        '--camera-calibration','--output',output]
-            if level == 'control': command += ['--servo-smoke-config',p['config']/'alignment.yaml']
+            if level == 'control': command += ['--servo-smoke-config',prepared['alignment']]
         if streaming:
             if level == 'perception': raise ValueError('Streaming check is available for devices/control')
             from runtime.streaming.turn_config import relay_ip

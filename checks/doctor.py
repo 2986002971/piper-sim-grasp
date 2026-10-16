@@ -3,7 +3,6 @@ import json
 from pathlib import Path
 import platform
 import subprocess
-from models.bundle import verify
 from runtime.config import paths
 
 
@@ -12,10 +11,10 @@ def doctor(config):
     issues = []
     if platform.machine() != 'x86_64': issues.append('Server architecture must be x86_64')
     required = [Path(config['isaac_env'])/'bin/python', Path('/opt/ros/humble/setup.bash'),
-                p['install']/'devices/local_setup.bash', p['config']/'devices.yaml']
+                p['install']/'devices/local_setup.bash']
     if config.get('main_project'):
         required += [p['install']/'main/local_setup.bash', p['install']/'servo/local_setup.bash',
-                     p['install']/'integration/local_setup.bash', p['config']/'alignment.yaml', p['config']/'detector.yaml']
+                     p['install']/'integration/local_setup.bash']
     if config.get('streaming', {}).get('enabled'):
         required += [p['sdk']/'nvenc/libnvenc_fix.so', p['sdk']/'turn/bin/turnserver',
                      Path('/usr/sbin/haproxy'), Path(config['streaming']['credentials_file'])]
@@ -38,20 +37,22 @@ def doctor(config):
             issues.append('Isaac environment is incomplete; rerun deploy')
     if config.get('main_project'):
         try:
-            from deploy.main_project import inspect
+            from deploy.main_project import inspect, build_digest
             inputs = inspect(config['main_project'])
             built = json.loads((p['reports']/'main-build-inputs.json').read_text())
-            if inputs['input_digest'] != built['input_digest']:
+            if build_digest(inputs['files']) != build_digest(built['files']):
                 issues.append('Main integration inputs changed since build; rebuild before starting an experiment')
         except (OSError, ValueError, KeyError) as error:
             issues.append('Main project: '+str(error))
     try:
-        assets = p['assets']/config['profile']
-        record = json.loads((assets/'current.json').read_text()); verify(assets/record['directory'])
-    except (OSError, ValueError, KeyError) as error: issues.append('Assets: '+str(error))
+        from runtime.scene import load_profile, validate_prepared
+        profile = load_profile(config)
+        validate_prepared(config, profile)
+    except (OSError, ValueError, KeyError, RuntimeError) as error: issues.append('Scene: '+str(error))
     try:
         gpu = subprocess.check_output(['nvidia-smi','--query-gpu=name,driver_version','--format=csv,noheader'], text=True).strip()
     except (OSError, subprocess.SubprocessError):
         gpu = None; issues.append('nvidia-smi failed')
     return {'passed': not issues, 'issues': issues, 'gpu': gpu, 'isaac_environment': versions, 'data_root': config['data_root'],
-            'main_project': config.get('main_project'), 'streaming': config.get('streaming', {}).get('enabled', False)}
+            'main_project': config.get('main_project'), 'profile': config['profile'],
+            'streaming': config.get('streaming', {}).get('enabled', False)}

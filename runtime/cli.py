@@ -42,7 +42,6 @@ def parser():
     experiment = sub.add_parser('experiment'); experiment.add_argument('operation', choices=['start', 'cancel'])
     client = sub.add_parser('export-client'); client.add_argument('--output', required=True, type=Path)
     assets = sub.add_parser('assets'); ops = assets.add_subparsers(dest='operation', required=True)
-    imp = ops.add_parser('import'); imp.add_argument('archive', type=Path)
     exp = ops.add_parser('export')
     for key in ('scene', 'robot-urdf', 'assembly-urdf', 'scene-metadata', 'output'): exp.add_argument('--'+key, required=True)
     check = sub.add_parser('check'); check.add_argument('level', choices=['devices', 'control', 'perception', 'unit'])
@@ -61,12 +60,6 @@ def execute(args, config):
         result = doctor(config); print(json.dumps(result, indent=2))
         return 0 if result['passed'] else 1
     if args.action == 'assets':
-        if args.operation == 'import':
-            from models.bundle import import_bundle
-            from runtime.lifecycle import exclusive_operation
-            with exclusive_operation(config):
-                directory, _ = import_bundle(args.archive, paths(config)['assets']/config['profile'])
-            print('Imported verified assets: '+str(directory)); return
         command = [ROOT/'models/bundle.py']
         for key in ('scene', 'robot_urdf', 'assembly_urdf', 'scene_metadata', 'output'):
             command += ['--'+key.replace('_','-'), getattr(args, key)]

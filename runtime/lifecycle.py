@@ -18,7 +18,10 @@ def exclusive_operation(config):
 def stamp(pid):
     # starttime protects stop from PID reuse. Field 2 may contain spaces.
     try:
-        return Path(f'/proc/{pid}/stat').read_text().rsplit(')', 1)[1].split()[19]
+        fields = Path(f'/proc/{pid}/stat').read_text().rsplit(')', 1)[1].split()
+        # An exited child may remain in /proc until its owner calls wait().
+        # It has already released its resources and must not keep stop waiting.
+        return None if fields[0] in ('Z', 'X') else fields[19]
     except FileNotFoundError:
         return None
 

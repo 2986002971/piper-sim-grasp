@@ -15,7 +15,7 @@ def validate(path):
     if abs(UsdGeom.GetStageMetersPerUnit(stage)-1)>1e-8: raise ValueError('Expected meter scene units')
     prims=list(Usd.PrimRange.Stage(stage,Usd.TraverseInstanceProxies()))
     names={p.GetName() for p in prims}
-    for expected in ['Link6','Link7','Link8','d405_color_optical_frame']:
+    for expected in ['link6','gripper_link1','gripper_link2','d405_color_optical_frame']:
         if expected not in names: raise ValueError('Missing assembly frame: '+expected)
     meshes=sum(p.IsA(UsdGeom.Mesh) for p in prims)
     if not meshes: raise ValueError('No mesh geometry')
@@ -23,7 +23,7 @@ def validate(path):
     metadata=path.parent/'assembly.json'
     if metadata.exists():
         expected=json.loads(metadata.read_text())['optical_transform']
-        wrist=next(p for p in stage.Traverse() if p.GetName()=='Link6')
+        wrist=next(p for p in stage.Traverse() if p.GetName()=='link6')
         optical=next(p for p in stage.Traverse() if p.GetName()=='d405_color_optical_frame')
         cache=UsdGeom.XformCache()
         relative=cache.GetLocalToWorldTransform(optical)*cache.GetLocalToWorldTransform(wrist).GetInverse()

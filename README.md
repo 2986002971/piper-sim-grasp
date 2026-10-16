@@ -4,17 +4,20 @@
 
 首个目标平台：Ubuntu 22.04、x86_64、RTX 4090、Isaac Sim 6.1。基础环境版本见 [版本清单](config/versions.lock.json)。主项目版本由开发者选择，本仓库不负责同步、拉取或切换主项目。
 
-以下命令从服务器上的仓库根目录执行；机器配置和场景包由使用者准备。服务器首次使用：
+以下命令从服务器上的仓库根目录执行；先准备机器配置、完整 USD 场景及配套 URDF，并填写仓库中的场景 profile。服务器首次使用：
 
 ```bash
 bash deploy/bootstrap.sh /private/machine.json
-./piper --config /private/machine.json --local assets import /path/to/7up-v1.tar.gz
 ./piper --config /private/machine.json --local build
 ./piper --config /private/machine.json --local doctor
 ./piper --config /private/machine.json --local check devices
 ```
 
-机器配置从 [示例](config/machine.example.json) 创建，放在仓库外。基础设备不需要主项目；填写 `main_project` 和推理模型输入后可构建抓取接入层。
+机器配置从 [示例](config/machine.example.json) 创建，放在仓库外。示例将源码与运行数据放在系统盘，Isaac 环境放在数据盘，可按实际容量调整。基础设备不需要主项目；填写 `main_project` 和推理模型输入后可构建抓取接入层。
+
+机器配置的 `profile` 明确选择远端仓库的 `config/profiles/<名称>.yaml`。该 YAML 指定源 USD、基础 ROS URDF、装配 URDF、初始关节角、手工粗略碰撞盒和感知先验；示例路径对应当前远端资源，换机器按实际位置修改。大型模型与贴图留在仓库外。
+
+每次 `start` 都重新读取远端 profile，并在本次会话日志目录生成运行配置。修改 USD 的布景、材质，或 profile 中的初始姿态、碰撞盒和现有实验参数后重启即可；程序、机器人装配（含引用网格）和推理模型变更时显式 `build`，输入检查范围见[资产说明](docs/assets.md#修改与新增)。源码同步由使用者完成，启动不拷贝 YAML、不拉取 Git、不编译。完整预定位已有一次成功记录，详见[验收记录](docs/verification.md)。
 
 使用串流前，将机器配置中的 `streaming.enabled` 设为 `true`，填入当前实例的公网 TCP 映射和凭据路径，再执行一次 `deploy`。基础示例默认不启用串流。
 
@@ -36,9 +39,9 @@ bash deploy/bootstrap.sh /private/machine.json
 - [架构](docs/architecture.md)：目录、进程、ROS／TF／时间边界。
 - [部署](docs/deployment.md)：裸机安装、外部主项目、模型输入和旧配置迁移。
 - [操作](docs/operation.md)：启停、实验、串流和日志。
-- [资产](docs/assets.md)：完整场景包、相对引用和模型制作。
+- [资产](docs/assets.md)：源场景与 profile、可选离线打包和模型制作。
 - [排障](docs/troubleshooting.md)、[验收状态](docs/verification.md)。
 
-Viewer 是独立的 `piper-stream-viewer` 仓库，服务器无需其源码或 Node。当前完整预定位、夹爪 Action、瓶子接触标定与完整抓取仍未完成；设备闭环通过不代表完整抓取通过。
+Viewer 是独立的 `piper-stream-viewer` 仓库，服务器无需其源码或 Node。夹爪 Action、瓶子接触标定与完整抓取仍未完成；预定位的重复性和视角覆盖仍待验收。
 
 项目自有代码采用 [MIT](LICENSE)，第三方资产见 [声明](THIRD_PARTY_NOTICES.md)。

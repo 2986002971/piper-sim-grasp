@@ -6,7 +6,6 @@ import http.cookiejar
 import io
 import json
 import math
-import os
 import re
 import shutil
 import subprocess
@@ -130,70 +129,46 @@ def pose(matrix):
              math.atan2(matrix[1][0],matrix[0][0])])
 
 
-def bracket_mount(robot):
-    """Flip the verified bracket about nominal J5, then seat it on the gripper.
+def robot_description(source):
+    """Use the same official arm and 100 mm gripper geometry as ROS/MoveIt."""
+    robot=ET.parse(source/'piper_x/urdf/piper_x_description.urdf').getroot()
+    # The USD importer fixes base_link itself; do not introduce a second world.
+    robot.remove(robot.find("link[@name='world']"))
+    robot.remove(robot.find("joint[@name='world_to_base_link']"))
+    gripper=ET.parse(source/'piper_x/urdf/piper_x_with_gripper_description.xacro').getroot()
+    for element in gripper:
+        if element.tag not in ('link','joint') or element.get('name') in ('gripper','gripper_link'):
+            continue
+        if element.tag=='joint' and element.get('name') in ('gripper_joint1','gripper_joint2'):
+            element.set('name','joint7' if element.get('name')=='gripper_joint1' else 'joint8')
+            element.remove(element.find('mimic'))
+        robot.append(element)
+    return robot
 
-    Coordinates are meters in Link6. The STEP origin is far from the solid;
-    compose the correction in Link6 instead of changing CAD-origin Euler angles.
-    Hole locations were measured on the pinned upstream meshes, not hardware.
+
+def bracket_mount():
+    """Mate the unscaled STEP bracket to the official ROS gripper's 12 mm holes.
+
+    Coordinates below are metres in link6, measured on the pinned meshes.
+    The old Isaac gripper had a 1.0447952 scale and a different visual origin;
+    its mounting-hole midpoint (z=44.907 mm) must not be reused here.
+    Registering the four shared CAD solids gives the corresponding underside
+    midpoint z=50.498 mm. The bracket is rigidly reseated, never scaled.
+    See models/README.md for the registration and collision evidence.
     """
-    original=transform([-.00052924206524,.13441999537,.188267514287],
-                       [.0108851337262,.004944067117,-3.14156574485])
-    joint6=robot.find("joint[@name='joint6']")
-    j5=robot.find("joint[@name='joint5']")
-    parent_axis=[float(x) for x in j5.find('axis').get('xyz').split()]
-    link6_to_link5=origin_matrix(joint6)
-    axis=[sum(link6_to_link5[j][i]*parent_axis[j] for j in range(3)) for i in range(3)]
-    length=math.sqrt(sum(x*x for x in axis));axis=[x/length for x in axis]
-    # Rodrigues at pi: Q = 2*a*a^T - I. No J5 translation is included.
-    correction=transform([0,0,0],[0,0,0])
-    for i in range(3):
-        for j in range(3): correction[i][j]=2*axis[i]*axis[j]-(i==j)
-    # Seat the flipped plate UNDER the gripper mounting tab. The original z=0
-    # face becomes the bracket's upper face after the half-turn; using z=10 and
-    # the gripper's upper face puts the plate inside the gripper housing.
-    # Left/right holes swap; preserve their XY midpoint and move only along J6.
-    bracket_holes=[.000000969,-.036,0.0]
-    gripper_holes=[-.000150584140758252,-.040170493329182435,.04490726500992732]
-    seating_clearance=.0002
-    for i in range(3):
-        correction[i][3]=gripper_holes[i]-sum(correction[i][j]*bracket_holes[j] for j in range(3))
-    # Keep the previous XY hole-axis reference depth: the relocation is axial.
-    for i in range(2): correction[i][3]-=correction[i][2]*.010
-    correction[2][3]-=seating_clearance
-    mounted=multiply(correction,original)
-    xyz,rpy=pose(mounted)
-    # Report the residual against the supplied camera pose, including --handeye.
-    camera_mesh=multiply(chain(robot,'Link6','d405_link'),
-                         origin_matrix(robot.find("link[@name='d405_link']/visual")))
-    camera_rear=[camera_mesh[i][3]-.023*camera_mesh[i][2] for i in range(3)]
-    previous_camera_holes=[.000002323,-.086315833,.027133537]
-    camera_holes=[correction[i][3]+sum(correction[i][j]*previous_camera_holes[j] for j in range(3))
-                  for i in range(3)]
-    plate_axis=[sum(correction[i][j]*[-.0000092,.3420201,-.9396926][j] for j in range(3))
-                for i in range(3)]
-    hole_direction=[sum(correction[i][j]*[1,.0000269,0][j] for j in range(3))
-                    for i in range(3)]
-    hole_direction=[v/math.sqrt(sum(x*x for x in hole_direction)) for v in hole_direction]
-    dot=sum(plate_axis[i]*camera_mesh[i][2] for i in range(3))
-    dot/=math.sqrt(sum(v*v for v in plate_axis))
+    xyz=[0.0006157431537362377,0.13258499564864346,-0.137835126783945]
+    rpy=[-3.129917939077873,-0.004944862834077357,-0.0017364652118565527]
     return xyz,rpy,{
-        'pose':'J5-parallel half-turn; bracket upper face below gripper mounting tab',
-        'xyz_m':xyz,'rpy_rad':rpy,'rotation_axis_in_Link6':axis,
-        'rotation_angle_rad':math.pi,
-        'bracket_contact_hole_midpoint_before_m':bracket_holes,
-        'gripper_contact_hole_midpoint_m':gripper_holes,
-        'gripper_contact_face':'underside',
-        'seating_clearance_m':seating_clearance,
-        'shift_from_previous_fit_in_Link6_m':[0,0,.04490726500992732-.05169947238448397-.010-seating_clearance],
-        'hole_pitch_mm':{'bracket_gripper':12.0,'gripper_mesh':12.537535807504865,
-                         'bracket_camera':20.0,'d405_rear':20.0},
-        'camera_rear_hole_midpoint_residual_mm':1000*math.sqrt(sum((camera_holes[i]-camera_rear[i])**2 for i in range(3))),
-        'camera_rear_axis_residual_deg':math.degrees(math.acos(min(1,max(-1,abs(dot))))),
-        'camera_mount_holes_in_Link6_m':[[camera_holes[i]+sign*.010*hole_direction[i]
-                                         for i in range(3)] for sign in (-1,1)],
-        'camera_mount_normal_in_Link6':plate_axis,
-        'fit_status':'mounting plate below gripper tab; camera rear holes have a remaining mismatch',
+        'pose':'official ROS gripper underside; rigid STEP bracket; 0.2 mm clearance',
+        'xyz_m':xyz,'rpy_rad':rpy,
+        'gripper_contact_hole_midpoint_m':[-0.0002055523379475621,-0.037982677289828716,0.05049776957080897],
+        'gripper_contact_face':'underside','seating_clearance_m':0.0002,
+        'hole_pitch_mm':{'bracket_gripper':12.0,'gripper_mesh':12.0,'bracket_camera':20.0,'d405_rear':20.0},
+        'camera_mount_holes_in_link6_m':[
+            [0.009707316728345352,-0.08829408799194591,0.023124521198220744],
+            [-0.010292653254265241,-0.08825943695432208,0.02312450525291853]],
+        'camera_mount_normal_in_link6':[0.0005905321704794716,0.34127752852424786,0.9399623562566594],
+        'fit_status':'12 mm gripper holes and 20 mm camera holes mated on pinned CAD',
     }
 
 
@@ -204,14 +179,14 @@ def seat_camera(robot, bracket_info):
     and the shell occupies -23 <= Z <= 0. The bracket face normal points out
     of its solid toward the gripper, so the camera optical forward stays +Z.
     """
-    holes=bracket_info['camera_mount_holes_in_Link6_m']
+    holes=bracket_info['camera_mount_holes_in_link6_m']
     def unit(v):
         length=math.sqrt(sum(x*x for x in v))
         return [x/length for x in v]
     def cross(a,b):
         return [a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]]
     x=unit([holes[1][i]-holes[0][i] for i in range(3)])
-    y=unit(cross(bracket_info['camera_mount_normal_in_Link6'],x))
+    y=unit(cross(bracket_info['camera_mount_normal_in_link6'],x))
     z=cross(x,y)
     midpoint=[(holes[0][i]+holes[1][i])/2 for i in range(3)]
     mesh=[[x[i],y[i],z[i],midpoint[i]+.023*z[i]] for i in range(3)]+[[0,0,0,1]]
@@ -223,17 +198,17 @@ def seat_camera(robot, bracket_info):
     origin=joint.find('origin')
     origin.set('xyz',' '.join(f'{v:.14g}' for v in xyz))
     origin.set('rpy',' '.join(f'{v:.14g}' for v in rpy))
-    actual=multiply(chain(robot,'Link6','d405_link'),
+    actual=multiply(chain(robot,'link6','d405_link'),
                     origin_matrix(robot.find("link[@name='d405_link']/visual")))
     rear=[[actual[i][3]+sign*.010*actual[i][0]-.023*actual[i][2]
            for i in range(3)] for sign in (-1,1)]
     residual=max(math.sqrt(sum((rear[j][i]-holes[j][i])**2 for i in range(3))) for j in range(2))
     if residual>1e-7 or z[2]<=0:
         raise ValueError('D405 mechanical mounting failed: rear holes or forward direction')
-    return chain(robot,'Link6','d405_color_optical_frame'),{
+    return chain(robot,'link6','d405_color_optical_frame'),{
         'placement':'bracket','reference':'pinned CAD rear holes and mating planes',
-        'rear_holes_in_Link6_m':rear,'rear_hole_residual_mm':1000*residual,
-        'rear_plane_clearance_m':0.0,'optical_forward_in_Link6':z,
+        'rear_holes_in_link6_m':rear,'rear_hole_residual_mm':1000*residual,
+        'rear_plane_clearance_m':0.0,'optical_forward_in_link6':z,
     }
 
 
@@ -248,7 +223,7 @@ def validate_urdf(path, expected):
         limit=joint.find('limit')
         if abs(float(limit.get('upper'))-float(limit.get('lower'))-.05)>1e-8:
             raise ValueError('Unexpected gripper stroke')
-    actual=chain(root,'Link6','d405_color_optical_frame')
+    actual=chain(root,'link6','d405_color_optical_frame')
     if max(abs(actual[i][j]-expected[i][j]) for i in range(4) for j in range(4)) > 1e-7:
         raise ValueError('D405 optical frame does not match hand-eye transform')
     return actual
@@ -267,12 +242,12 @@ def assembly(source, output, handeye, bracket=None, camera_placement='bracket'):
             if abs(sum(matrix[k][i]*matrix[k][j] for k in range(3))-(1 if i==j else 0)) > 1e-6:
                 raise ValueError('Hand-eye rotation is not orthonormal')
     output.mkdir(parents=True,exist_ok=True)
-    robot=ET.parse(source/'piper_x_description/urdf/piper_x_description.urdf').getroot()
+    robot=robot_description(source)
     robot.set('name','piper_x_d405_assembly')
     links={node.get('name') for node in robot.findall('link')}
-    if 'Link6' not in links: raise ValueError('Expected case-sensitive wrist Link6')
+    if 'link6' not in links: raise ValueError('Expected case-sensitive wrist link6')
     for mesh in robot.iter('mesh'):
-        relative=mesh.get('filename').removeprefix('package://')
+        relative=mesh.get('filename').removeprefix('package://agx_arm_description/agx_arm_urdf/')
         src=source/relative
         dst=output/'meshes/piper_x'/src.name
         dst.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(src,dst)
@@ -284,10 +259,10 @@ def assembly(source, output, handeye, bracket=None, camera_placement='bracket'):
     wrapper=output/'camera.xacro'
     wrapper.write_text(f'''<robot name="d405" xmlns:xacro="http://ros.org/wiki/xacro">
 <xacro:include filename="{camera}/urdf/_d405.urdf.xacro"/>
-<xacro:sensor_d405 parent="Link6" name="d405" use_nominal_extrinsics="true"><origin xyz="0 0 0" rpy="0 0 0"/></xacro:sensor_d405>
+<xacro:sensor_d405 parent="link6" name="d405" use_nominal_extrinsics="true"><origin xyz="0 0 0" rpy="0 0 0"/></xacro:sensor_d405>
 </robot>''')
     cam=ET.fromstring(xacro.process_file(str(wrapper)).toxml())
-    nominal=chain(cam,'Link6','d405_color_optical_frame')
+    nominal=chain(cam,'link6','d405_color_optical_frame')
     mount=multiply(matrix,inverse(nominal));xyz,rpy=pose(mount)
     origin=cam.find("joint[@name='d405_joint']/origin")
     origin.set('xyz',' '.join(f'{v:.14g}' for v in xyz)); origin.set('rpy',' '.join(f'{v:.14g}' for v in rpy))
@@ -297,7 +272,7 @@ def assembly(source, output, handeye, bracket=None, camera_placement='bracket'):
     shutil.copy2(source/'realsense2_description/meshes/d405.stl',dest)
     for node in cam: robot.append(node)
     bracket_info=None
-    camera_info={'placement':'handeye','reference':'supplied Link6 optical transform'}
+    camera_info={'placement':'handeye','reference':'supplied link6 optical transform'}
     if bracket:
         bracket=Path(bracket).resolve()
         dest=output/'meshes/d405_mount.stl'
@@ -305,26 +280,24 @@ def assembly(source, output, handeye, bracket=None, camera_placement='bracket'):
             subprocess.run([sys.executable,str(HERE/'convert_step.py'),str(bracket),str(dest)],check=True)
         elif bracket.suffix.lower()=='.stl': shutil.copy2(bracket,dest)
         else: raise ValueError('Bracket override must be STEP or STL (millimeters)')
-        bracket_xyz,bracket_rpy,bracket_info=bracket_mount(robot)
+        bracket_xyz,bracket_rpy,bracket_info=bracket_mount()
         bracket_info['source_sha256']=digest(bracket)
         joint=ET.SubElement(robot,'joint',name='d405_bracket_joint',type='fixed')
         ET.SubElement(joint,'origin',xyz=' '.join(f'{v:.14g}' for v in bracket_xyz),
                       rpy=' '.join(f'{v:.14g}' for v in bracket_rpy))
-        ET.SubElement(joint,'parent',link='Link6'); ET.SubElement(joint,'child',link='d405_bracket')
+        ET.SubElement(joint,'parent',link='link6'); ET.SubElement(joint,'child',link='d405_bracket')
         link=ET.SubElement(robot,'link',name='d405_bracket');vis=ET.SubElement(link,'visual');geometry=ET.SubElement(vis,'geometry')
         ET.SubElement(geometry,'mesh',filename='meshes/d405_mount.stl',scale='0.001 0.001 0.001')
         if camera_placement=='bracket':
             matrix,camera_info=seat_camera(robot,bracket_info)
-            _,_,bracket_info=bracket_mount(robot)
-            bracket_info['source_sha256']=digest(bracket)
-            bracket_info['fit_status']='camera rear holes and plane mated; gripper hole pitch differs by 0.54 mm'
     else:
         print('NOTICE: no verified bracket cache/override; generating geometry without bracket.',file=sys.stderr)
     urdf=output/'piper_x_d405.urdf';ET.indent(robot);ET.ElementTree(robot).write(urdf,encoding='utf-8',xml_declaration=True)
     actual=validate_urdf(urdf,matrix)
     (output/'assembly.json').write_text(json.dumps({'sources':LOCK,'handeye_sha256':digest(handeye),
         'optical_transform':actual,'bracket':bracket_info,'camera_mount':camera_info,
-        'meters_per_unit':1,'camera_sensor_enabled':False},indent=2))
+        'robot_model':'agx_arm_urdf/piper_x','meters_per_unit':1,'camera_sensor_enabled':False},indent=2))
+    shutil.copy2(source/'LICENSE',output/'PIPER-LICENSE')
     shutil.copy2(source/'realsense2_description/LICENSE',output/'REALSENSE-LICENSE')
     original=(source/'realsense2_description/urdf/_d405.urdf.xacro').read_text()
     notices=re.findall(r'<!--(.*?)-->',original,re.S)

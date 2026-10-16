@@ -14,11 +14,21 @@ SERVO = Path('src/third_party/moveit_servo_reference')
 TOOLS = ('src/piper/pyagxarm/checks/prepare_w_model.py',
          'src/perception/nankai_robocup_perception_bringup/tools/generate_detection_manifest.py',
          'scripts/check_visp.py')
+# These files are read from source when preparing a session, not from install.
+RUNTIME_CONFIGS = {
+    'src/manipulation/nankai_robocup_grasp_geometry/config/'+name
+    for name in ('alignment.yaml', 'alignment.example.yaml', 'd405_yolo.yaml')}
+
+
+def build_digest(files):
+    return hashlib.sha256(json.dumps({name: value for name, value in files.items()
+        if name not in RUNTIME_CONFIGS}, sort_keys=True).encode()).hexdigest()
 
 
 def inspect(source):
     source = Path(source).resolve()
-    required = [source/p/'package.xml' for p in PACKAGES]+[source/p for p in TOOLS]+[source/SERVO/'build_overlay.py']
+    required = ([source/p/'package.xml' for p in PACKAGES]+[source/p for p in TOOLS]+
+                [source/SERVO/'build_overlay.py']+[source/p for p in sorted(RUNTIME_CONFIGS)])
     missing = [str(p.relative_to(source)) for p in required if not p.is_file()]
     if missing: raise ValueError('Main project lacks required integration inputs: '+', '.join(missing))
     inputs = {}
@@ -43,3 +53,9 @@ def stage_servo(source, data):
     if target.exists(): shutil.rmtree(target)
     shutil.copytree(Path(source)/SERVO, target, ignore=shutil.ignore_patterns('__pycache__'))
     return root
+
+
+if __name__ == '__main__':
+    import sys
+    source = Path(sys.argv[1]).resolve()
+    print('\n'.join(str(source/package) for package in PACKAGES))

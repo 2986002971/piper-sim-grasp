@@ -7,6 +7,7 @@ import shutil
 import subprocess
 from models.bundle import digest
 from runtime.config import ROOT, paths, write_json
+from deploy.tensorrt_resources import builder_library
 
 
 def build_engine(config, log):
@@ -34,9 +35,11 @@ def build_engine(config, log):
     sdk = p['sdk']/'tensorrt'
     env = dict(os.environ, LD_LIBRARY_PATH=str(sdk/'usr/lib/x86_64-linux-gnu'))
     engine = destination/'model.engine'
-    run([sdk/'usr/src/tensorrt/bin/trtexec','--onnx='+model['onnx'],'--saveEngine='+str(engine),
-         '--fp16','--inputIOFormats=fp32:chw','--outputIOFormats=fp32:chw',
-         '--skipInference','--memPoolSize=workspace:2048'],log,env)
+    with builder_library(sdk, p['cache']) as resources:
+        builder_env = dict(env, LD_LIBRARY_PATH=str(resources)+':'+env['LD_LIBRARY_PATH'])
+        run([sdk/'usr/src/tensorrt/bin/trtexec','--onnx='+model['onnx'],'--saveEngine='+str(engine),
+             '--fp16','--inputIOFormats=fp32:chw','--outputIOFormats=fp32:chw',
+             '--skipInference','--memPoolSize=workspace:2048'],log,builder_env)
     manifest = destination/'model.manifest.yaml'
     manifest.unlink(missing_ok=True)  # only an incomplete, owned generation can reach here
     run(['/usr/bin/python3',generator,'--source-pt',model['source_pt'],'--onnx',model['onnx'],

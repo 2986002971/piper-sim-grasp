@@ -9,7 +9,7 @@ from unittest.mock import patch
 from runtime import session
 from runtime.config import load, write_json
 from runtime.streaming.turn_config import render
-from runtime.lifecycle import exclusive_operation
+from runtime.lifecycle import exclusive_operation, stamp
 
 class RuntimeTests(unittest.TestCase):
     def test_mutation_cannot_overlap_session_or_build(self):
@@ -57,6 +57,20 @@ class RuntimeTests(unittest.TestCase):
                 session.stop(c)
                 kill.assert_not_called()
             self.assertFalse(session.status(c)['manager_active'])
+
+    def test_stop_does_not_wait_for_parent_to_reap_exited_manager(self):
+        with tempfile.TemporaryDirectory() as temp:
+            child = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(30)'])
+            try:
+                config = {'data_root': temp}
+                write_json(Path(temp)/'state/session.json', {'pid': child.pid, 'start': stamp(child.pid)})
+                session.stop(config)
+                # No poll/wait ran before stop: the terminated child can still
+                # exist as a zombie, but no longer owns a live session.
+                self.assertFalse(session.status(config)['manager_active'])
+            finally:
+                if child.poll() is None: child.kill()
+                child.wait()
 
     def test_reject_data_inside_checkout(self):
         with tempfile.TemporaryDirectory() as temp:

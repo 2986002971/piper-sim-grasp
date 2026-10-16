@@ -10,10 +10,10 @@ import os
 from pathlib import Path
 import platform
 import subprocess
+import sys
 
-LOCK = json.loads((Path(__file__).resolve().parents[1]/'config/versions.lock.json').read_text())
-VERSION = LOCK['tensorrt']+'-1+cuda'+LOCK['cuda']
-BASE = 'https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/'
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from deploy.tensorrt_resources import LOCK, VERSION, BASE, download as download_package, prune_builder_resources
 PACKAGES = ('libnvinfer10', 'libnvinfer-headers-dev', 'libnvinfer-headers-plugin-dev',
             'libnvinfer-plugin10', 'libnvonnxparsers10', 'libnvinfer-lean10',
             'libnvinfer-dispatch10', 'libnvinfer-vc-plugin10', 'libnvinfer-bin')
@@ -39,15 +39,9 @@ def main():
             filename = f'{package}_{VERSION}_amd64.deb'
             archive = download / filename
             print(f'Downloading {package} {VERSION}', flush=True)
-            subprocess.run(['curl', '--fail', '--location', '--silent', '--show-error',
-                            '--retry', '4', '--retry-all-errors', '--connect-timeout', '15',
-                            '--speed-time', '60', '--speed-limit', '1024', '--max-time', '1800',
-                            '--continue-at', '-', '--output', str(archive),
-                            BASE + filename], check=True)
-            actual = subprocess.check_output(['dpkg-deb', '-f', str(archive), 'Version'], text=True).strip()
-            if actual != VERSION:
-                raise RuntimeError(f'Unexpected SDK package version: {actual}')
+            download_package(package, archive)
             subprocess.run(['dpkg-deb', '-x', str(archive), str(prefix)], check=True)
+            prune_builder_resources(prefix)
             archive.unlink()
             installed.append(package)
             receipt.write_text(json.dumps(installed) + '\n')
@@ -59,11 +53,15 @@ def main():
                                      'packages': list(PACKAGES), 'source': BASE}, indent=2) + '\n')
     if json.loads(marker.read_text())['version'] != LOCK['tensorrt']:
         raise RuntimeError('Unexpected existing TensorRT SDK')
+    prune_builder_resources(prefix)
+    metadata = json.loads(marker.read_text())
+    metadata['layout'] = 'runtime-only'
+    marker.write_text(json.dumps(metadata, indent=2)+'\n')
     env = dict(os.environ)
     env['LD_LIBRARY_PATH'] = str(prefix / 'usr/lib/x86_64-linux-gnu') + ':' + env.get('LD_LIBRARY_PATH', '')
     executable = prefix / 'usr/src/tensorrt/bin/trtexec'
     subprocess.run([str(executable), '--help'], stdout=subprocess.DEVNULL, env=env, check=True)
-    print(f'TensorRT dynamic SDK ready: {prefix}', flush=True)
+    print(f'TensorRT runtime SDK ready (builder resources are temporary): {prefix}', flush=True)
 
 
 if __name__ == '__main__':
