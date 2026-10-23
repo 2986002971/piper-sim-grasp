@@ -6,14 +6,12 @@
 
 机械臂和 100 mm 夹爪固定使用 [AgileX 官方 ROS 模型](https://github.com/agilexrobotics/agx_arm_urdf/tree/f6642ce0d7872c686f29c99e9e10cd23d1d49313/piper_x)，
 与主工程 `pyagxarm` 的 `reference_piper_x` 来源一致。`joint7/8` 各行程 50 mm，去除虚拟宽度关节和 mimic 后，使用 `joint7=width/2`、`joint8=-width/2`。
-显示 DAE、碰撞 STL、关节坐标和固定连接均取自该模型。部署生成 ROS 模型时核对关节、网格内容、缩放和几何原点，发现不同即要求修复输入。
+显示 DAE 和碰撞 STL 取自该模型。接入当前主项目时，部署以宏驱动的 SDK MDH 名义模型为关节基准（腕部 35.26 mm，J6 ±π），生成匹配的 ROS 模型和 USD 派生层，通过 data_root/models/<profile> 访问。
 运行时只检查 USD 和 ROS 的八个运动关节，不再修改 USD 关节锚点来适配另一套模型。
 
-碰撞体的形状和尺寸在 URDF 中，SRDF 描述 MoveIt 分组及碰撞对豁免。
-用户核对实机约 4.13 mm 间隙并确认腕部机械约束后，仿真生成的 SRDF 单独将
-`link4`—`sim_d405_bracket` 标为 `Never`。该对的距离减速与接触检查均被豁免；
-支架碰撞几何仍保留，其与其他非豁免机械臂部分及环境的检查继续执行。
-此规则仅在当前仿真仓库生成，主项目模型和源码不修改。更换支架或安装方式需重新核对。
+碰撞体的形状和尺寸来自原装配。新的控制派生层继承源 USD 的机器人质量、惯量、驱动和碰撞过滤，只显式对齐关节坐标及位置限位。RSP 使用派生 ROS 模型，基座固定别名提供 piper_base_link；相机光学安装保持单独的静态 TF。
+
+旧 W 路线曾使用 SRDF 的 link4—sim_d405_bracket 豁免。新宏驱动不运行 MoveIt 规划场景或距离减速，该 SRDF 不再生成或参与运行；PhysX 的实际碰撞配置保留。模型历史依据仍见下文。
 
 D405 壳体和名义框架沿用锁文件中的 RealSense 描述，毫米网格缩放 0.001。
 RealSense 描述来源提交 `bafc21080c5c8e259dadbb309797949aee0dd950`、Apache-2.0 许可证和逐文件来源均在 `sources.lock.json` 中记录。
@@ -36,10 +34,10 @@ RealSense 描述来源提交 `bafc21080c5c8e259dadbb309797949aee0dd950`、Apache
 - ROS 官方模型的对应夹爪 CAD 部件使用 0.001，孔距为 12 mm；原仿真模型为约 12.5375 mm。四个共有 CAD 实体逆缩放并刚体配准后，18,332 个唯一顶点的最大残差约 0.000077 mm。
 - 两套末端关节也不完全一致：J5 原点从 `[76.857, 0.62395, 0]` mm 变成 `[74.66, 0, 0]` mm；原来运行时将后者写入前者，形成混合装配。
 - 原夹爪安装孔中点为 `[-0.150584, -40.170493, 44.907265]` mm。复制该安装变换到 ROS 夹爪会将支架沿腕部 Z 方向放近约 5.59 mm；修复使用对应孔位刚体重装，支架不缩放。
-- 离线三角网格碰撞复现：初始 J5=-0.17006、J6=-0.7 rad 时，混合装配的 link4 与支架相交；正确重装后距离约 4.133 mm。该数值仅代表测试姿态，不是全工作空间最小距离。此后单独豁免了 link4—sim_d405_bracket；当前 Servo 的接近碰撞减速保留于其余非豁免碰撞对，见[验收记录](../docs/verification.md)。
+- 离线三角网格碰撞复现：初始 J5=-0.17006、J6=-0.7 rad 时，混合装配的 link4 与支架相交；正确重装后距离约 4.133 mm。该数值仅代表测试姿态，不是全工作空间最小距离。旧 W 路线此后单独豁免了 link4—sim_d405_bracket；该历史 SRDF 规则已随 W 退出当前运行，见[验收记录](../docs/verification.md)。
 
 主工程在 2026-09-23 的模型校核中记录采用官方 ROS 模型，并于 09-26 提交；仿真于 10-10 仍使用 CAD 模型，10-13 增加了关节映射。此次统一模型并重新装配，避免混用。
-要替换已有场景，先用 `prepare.py` 生成新资产，再运行 `replace_robot.py --scene OLD --robot-usd ASSEMBLY --output NEW`。
+制作新的基础装配并替换整个机器人时，先用 `prepare.py` 生成新资产，再运行 `replace_robot.py --scene OLD --robot-usd ASSEMBLY --output NEW`。
 该脚本保留场景环境、机器人基座位置和驱动增益，移除旧机器人上的质量、关节位置等覆盖，采用新 URDF 的定义。输出必须是新文件；在 profile 中更新场景、装配 URDF 和 `camera_mount`，重新 build/check 后使用。
 
 源缓存有效时直接复用；缺失或损坏的离线缓存会失败，下载/哈希失败不会启动不完整场景。
@@ -53,6 +51,7 @@ RealSense 描述来源提交 `bafc21080c5c8e259dadbb309797949aee0dd950`、Apache
 可用 `--bracket-cookie-file` 指定仓库外的 Netscape/Mozilla cookie 文件，或用 `--bracket` 提供已有 STL。
 STEP 转换依赖 `requirements-step-conversion.txt` 的 OpenCascade wheel；外部 STL 可直接 `--bracket`（毫米）。
 生成资产提供 D405 的 optical frame 与 Camera。正式运行统一通过根目录 `piper` 入口；
+当前主项目接入使用 deploy/prepare-grasp-model.py 与 models/prepare_control_scene.py，在 data_root/models 下制作模型和引用源场景的派生层；不会覆盖源 USD。
 RGB、光轴深度与 CameraInfo 由同一传感器发布，相机预览复用该渲染产品；WebRTC 串流显示当前 Isaac 视口。源场景的选择、可选离线打包和迁移见
 [资产管理](../docs/assets.md)。原始模型制作与日常部署相互独立；运行时由 profile 选择源场景，启动不执行模型制作或资产导入。
 

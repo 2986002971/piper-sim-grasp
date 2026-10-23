@@ -3,7 +3,6 @@
 set -eo pipefail
 source_root="${1:?Usage: install-grasp-deps.sh MAIN_SOURCE DATA_DIR}"
 data_root="${2:?Usage: install-grasp-deps.sh MAIN_SOURCE DATA_DIR}"
-servo_root="${3:?isolated Servo source root required}"
 repo_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 [[ $(dpkg --print-architecture) = amd64 ]] || { echo 'This deployment targets amd64.' >&2; exit 2; }
 [[ -f /opt/ros/humble/setup.bash ]] || { echo 'Install Humble first.' >&2; exit 2; }
@@ -12,33 +11,16 @@ exec > >(tee -a "$data_root/dependencies/install.log") 2>&1
 source /opt/ros/humble/setup.bash
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
-# This image retained ICU's proposed runtime after the test source was disabled.
-# Install its matching development files; keep the runtime used by Isaac intact.
-icu_version="$(dpkg-query -W -f='${Version}' libicu70)"
-icu_candidate="$(apt-cache policy libicu-dev | sed -n 's/^  Candidate: //p')"
-icu_packages=()
-if [[ "$icu_version" != "$icu_candidate" ]]; then
-  [[ "$icu_version" = 70.1-2ubuntu1 ]] || { echo "Unexpected ICU version: $icu_version" >&2; exit 2; }
-  for icu_package in icu-devtools libicu-dev; do
-    archive="$data_root/dependencies/${icu_package}_${icu_version}_amd64.deb"
-    curl --fail --location --retry 3 --retry-all-errors --output "$archive" \
-      "https://repo.huaweicloud.com/ubuntu/pool/main/i/icu/${icu_package}_${icu_version}_amd64.deb"
-    [[ "$(dpkg-deb -f "$archive" Version)" = "$icu_version" ]] || exit 2
-    icu_packages+=("$archive")
-  done
-fi
-base_packages=(build-essential cmake ccache libssl-dev libyaml-cpp-dev
-  ros-humble-moveit-servo ros-humble-visp python3-pytest python3-numpy
-  python3-scipy python3-opencv python3-yaml "${icu_packages[@]}")
+base_packages=(build-essential cmake ccache libeigen3-dev libyaml-cpp-dev
+  ros-humble-control-msgs ros-humble-rclcpp-action ros-humble-urdf
+  python3-pytest python3-numpy python3-scipy python3-opencv python3-yaml)
 apt-get -s install --no-install-recommends "${base_packages[@]}" > "$data_root/dependencies/base-dry-run.txt"
 if grep -q '^Remv ' "$data_root/dependencies/base-dry-run.txt"; then
   echo 'Dependency resolution would remove packages.' >&2; exit 2
 fi
 apt-get install -y --no-remove --no-install-recommends "${base_packages[@]}"
-python3 "$servo_root/src/third_party/moveit_servo_reference/build_overlay.py" --prepare-only
 package_paths="$(python3 "$repo_root/deploy/main_project.py" "$source_root")"
 mapfile -t paths <<< "$package_paths"
-paths+=("$servo_root/build/servo_reference/src/moveit_servo")
 # Isaac provides the camera topics; the real-camera launch is not used.
 rosdep install --simulate --from-paths "${paths[@]}" --ignore-src --rosdistro humble \
   --skip-keys realsense2_camera -y > "$data_root/dependencies/rosdep-dry-run.txt"

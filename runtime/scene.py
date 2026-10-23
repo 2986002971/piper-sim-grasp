@@ -44,7 +44,7 @@ def load_profile(config):
                 'rgb_topic', 'depth_topic', 'camera_info_topic'):
         if not isinstance(profile.get(key), str) or not profile[key]:
             raise ValueError(f'{path}: {key} requires a nonempty string')
-    for key in ('physics_hz', 'camera_hz', 'bottle_height_m', 'bottle_radius_m', 'execution_timeout_s',
+    for key in ('physics_hz', 'camera_hz', 'bottle_height_m', 'bottle_radius_m',
                 'arm_drive_stiffness', 'arm_drive_damping', 'gripper_drive_stiffness', 'gripper_drive_damping'):
         value = profile.get(key)
         if not isinstance(value, (int, float)) or isinstance(value, bool) or not math.isfinite(value) or value <= 0:
@@ -52,20 +52,20 @@ def load_profile(config):
     width = profile.get('gripper_width_m')
     if not isinstance(width, (int, float)) or not math.isfinite(width) or not 0 <= width <= .1:
         raise ValueError('gripper_width_m must be between 0 and 0.1 m')
-    boxes = profile.get('scene_boxes')
-    if not isinstance(boxes, list) or not boxes:
-        raise ValueError('scene_boxes requires manually configured collision boxes')
-    ids = set()
-    for box in boxes:
-        if not isinstance(box, dict) or not isinstance(box.get('id'), str) or not box['id'] or box['id'] in ids:
-            raise ValueError('scene_boxes requires unique nonempty IDs')
-        ids.add(box['id'])
-        for key, size in (('size', 3), ('position', 3), ('quaternion', 4)):
-            vector(box.get(key), size, f"scene_boxes.{box['id']}.{key}")
-        if min(box['size']) <= 0 or not math.isclose(sum(x*x for x in box['quaternion']), 1., abs_tol=1e-4):
-            raise ValueError('scene_boxes requires positive sizes and unit quaternions')
+    physical = profile.get('bottle_physics')
+    if physical:
+        if not physical.get('prim', '').startswith('/'):
+            raise ValueError('bottle_physics requires an absolute prim path')
+        for key in ('mass_kg', 'static_friction', 'dynamic_friction', 'restitution'):
+            value = physical.get(key)
+            if not isinstance(value, (int, float)) or not math.isfinite(value) or value < 0:
+                raise ValueError('Invalid bottle_physics '+key)
+        if physical['mass_kg'] == 0 or physical['restitution'] > 1:
+            raise ValueError('Invalid bottle mass or restitution')
     # Validate initial positions against the ROS joint names, signs and limits.
-    robot = ET.parse(profile['robot_urdf']).getroot()
+    limit_model = (Path(config['main_project'])/'src/manipulation/nankai_robocup_arm_control/config/robot.urdf'
+                   if config.get('main_project') else Path(profile['robot_urdf']))
+    robot = ET.parse(limit_model).getroot()
     for i, position in enumerate(profile['initial_joint_positions'], 1):
         joint = robot.find(f"joint[@name='joint{i}']")
         limit = joint.find('limit') if joint is not None else None
@@ -75,9 +75,11 @@ def load_profile(config):
 
 
 def model_inputs(profile):
-    return {key: {'path': str(Path(profile[key]).resolve()),
+    inputs = {key: {'path': str(Path(profile[key]).resolve()),
                   'sha256': hashlib.sha256(Path(profile[key]).read_bytes()).hexdigest()}
             for key in ('robot_urdf', 'assembly_urdf')}
+    inputs.update(scene_source=profile['scene_usd'], bottle_physics=profile.get('bottle_physics'))
+    return inputs
 
 
 def model_directory(config):
@@ -93,8 +95,8 @@ def validate_prepared(config, profile=None, main=None):
     receipt = None
     if main:
         model = model_directory(config)
-        required += [data/'install'/part/'local_setup.bash' for part in ('main', 'servo', 'integration')]
-        required += [model/name for name in ('robot.urdf', 'robot.srdf', 'joint_limits.yaml', 'build.json')]
+        required += [data/'install'/part/'local_setup.bash' for part in ('main', 'integration')]
+        required += [model/name for name in ('robot.urdf', 'assembly.urdf', 'scene.usda', 'build.json')]
     missing = [str(p) for p in required if not p.is_file()]
     if missing:
         raise RuntimeError(f"Run piper build for profile {config['profile']}; missing: "+', '.join(missing))
@@ -145,16 +147,15 @@ def prepare(config, directory, main=None):
         robot = directory/'robot.urdf'
         resolved_robot(profile['robot_urdf'], robot)
     devices = {key: copy.deepcopy(value) for key, value in profile.items()
-               if key not in ('robot_urdf', 'assembly_urdf', 'scene_boxes',
-                              'bottle_height_m', 'bottle_radius_m', 'execution_timeout_s')}
+               if key not in ('robot_urdf', 'assembly_urdf', 'bottle_height_m', 'bottle_radius_m', 'pick', 'arm')}
     devices.update(isaac_env=config['isaac_env'], urdf_file=str(robot),
                    output_dir=str(data/'state/devices'),
                    cache_root=str(data/'cache'), gpu_lock='/tmp/piper-sim-gpu0.lock',
                    ros_domain_id=config['ros_domain_id'])
-    result = {'devices': save('devices.yaml', devices), 'profile': profile}
+    result = {'profile': profile}
     if main:
         model = model_directory(config)
-        geometry = Path(config['main_project'])/'src/manipulation/nankai_robocup_grasp_geometry/config'
+        geometry = Path(config['main_project'])/'src/manipulation/nankai_robocup_manipulation/config'
         alignment = yaml.safe_load((geometry/'alignment.example.yaml').read_text())
         # Share the reviewed geometry-to-TCP convention with the real experiment;
         # its hardware paths and execution settings do not belong to simulation.
@@ -162,16 +163,21 @@ def prepare(config, directory, main=None):
         geometry_T_tcp = experiment['source']['geometry_T_tcp']
         vector(geometry_T_tcp, 7, 'alignment.yaml source.geometry_T_tcp')
         alignment['source']['geometry_T_tcp'] = geometry_T_tcp
-        alignment['source'].update(bottle_height=profile['bottle_height_m'],
+        overrides = dict(base_frame='piper_base_link', bottle_height=profile['bottle_height_m'],
                                    bottle_radius=profile['bottle_radius_m'],
-                                   execution_timeout=profile['execution_timeout_s'],
                                    optical_frame=profile['optical_frame'],
                                    depth_topic=profile['depth_topic'],
                                    camera_info_topic=profile['camera_info_topic'])
-        scene = save('scene.yaml', {'boxes': profile['scene_boxes']})
-        alignment['w'].update(urdf_file=str(model/'robot.urdf'), srdf_file=str(model/'robot.srdf'),
-                              limits_file=str(model/'joint_limits.yaml'), scene_file=str(scene))
+        alignment['source'].update(overrides)
+        alignment['source']['stop_at_preposition'] = True
+        alignment['arm'].update(profile.get('arm', {}))
         result['alignment'] = save('alignment.yaml', alignment)
+        pick = yaml.safe_load((geometry/'pick.yaml').read_text())
+        pick['source'].update(overrides)
+        pick['source']['geometry_T_tcp'] = geometry_T_tcp
+        pick['pick'].update(profile.get('pick', {}))
+        result['pick'] = save('pick.yaml', pick)
+        devices.update(scene_usd=str(model/'scene.usda'), arm=copy.deepcopy(alignment['arm']))
         detector = yaml.safe_load((geometry/'d405_yolo.yaml').read_text())
         parameters = detector['object_detector']['ros__parameters']
         engine = Path(receipt['engine_directory'])
@@ -181,4 +187,6 @@ def prepare(config, directory, main=None):
         parameters['streams.wrist.input_image_topic'] = profile['rgb_topic']
         detector['/grasp_detection/object_detector'] = detector.pop('object_detector')
         result['detector'] = save('detector.yaml', detector)
+    result['devices'] = save('devices.yaml', devices)
+    result['scene_usd'] = devices['scene_usd']
     return result

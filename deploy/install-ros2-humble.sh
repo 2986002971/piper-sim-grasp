@@ -12,7 +12,7 @@ source /etc/os-release
 root="${1:?installation report directory required}"
 [[ "$root" = /* && "$root" != / ]] || { echo 'Use an absolute data directory.' >&2; exit 1; }
 umask 077
-mkdir -p "$root/backups" "$root/ws/src"
+mkdir -p "$root/backups"
 backup="$root/backups/$(date -u +%Y%m%dT%H%M%SZ)"
 mkdir -p "$backup"
 cp -a /etc/apt/sources.list /etc/apt/sources.list.d "$backup/"
@@ -81,5 +81,5 @@ dpkg-query -W -f='${Package} ${Version}\n' ros2-apt-source "${packages[@]}" \
   > "$root/ros-packages.txt"
 /usr/bin/python3 --version
 cat "$root/ros-packages.txt"
-echo "ROS 2 Humble installed. Workspace: $root/ws"
+echo "ROS 2 Humble installed. Installation report: $root"
 echo 'Run commands through runtime/ros2-env.sh; leave the Isaac environment separate.'

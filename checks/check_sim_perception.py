@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run existing YOLO/geometry/M/W against simulated devices without starting motion."""
+"""Run existing YOLO/geometry against simulated devices without starting motion."""
 import argparse
 import json
 import os
@@ -66,7 +66,7 @@ def main():
         repo = Path(__file__).resolve().parents[1]
         start(['bash', str(repo/'runtime/isaac/run-isaac-ros.sh'), str(args.devices_config)], 'isaac')
         start(['ros2', 'launch', 'piper_sim_devices', 'devices.launch.py', 'config:='+str(args.devices_config)], 'devices')
-        start(['ros2', 'launch', 'nankai_robocup_grasp_geometry', 'grasp_alignment.launch.py',
+        start(['ros2', 'launch', 'nankai_robocup_manipulation', 'grasp_alignment.launch.py',
                'config:='+str(args.alignment_config), 'use_sim_time:=true'], 'alignment')
         start(['ros2', 'run', 'nankai_robocup_object_perception', 'object_detector_node', '--ros-args',
                '-r', '__ns:=/grasp_detection', '-r', '__node:=object_detector',

@@ -15,11 +15,7 @@ from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 from rclpy.time import Time
 from rosgraph_msgs.msg import Clock
-from geometry_msgs.msg import TwistStamped
-from std_msgs.msg import Int8
-from std_srvs.srv import Trigger
 from sensor_msgs.msg import Image, CameraInfo, JointState
-from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 from tf2_ros import Buffer, TransformListener
 import yaml
 
@@ -36,8 +32,6 @@ class Probe(Node):
         self.clock = 0
         self.joints = None
         self.states = []
-        self.servo_status = None
-        self.trajectories = []
         self.config = config
         for key, msg_type, topic in [('rgb', Image, config['rgb_topic']),
                                       ('depth', Image, config['depth_topic']),
@@ -53,10 +47,7 @@ class Probe(Node):
             self.states.append(dict(zip(message.name, message.position)))
         self.create_subscription(Clock, '/clock', clock, qos_profile_sensor_data)
         self.create_subscription(JointState, config['driver_namespace']+'/joint_states', joints, 10)
-        self.command = self.create_publisher(JointTrajectory, config['driver_namespace']+'/command', 1)
-        self.create_subscription(JointTrajectory, config['driver_namespace']+'/command',
-                                 self.trajectories.append, 1)
-        self.create_subscription(Int8, '/w_servo/servo_status', lambda m: setattr(self, 'servo_status', m.data), 10)
+        self.command = self.create_publisher(JointState, config['bridge_command_topic'], 1)
         self.tf = Buffer()
         self.listener = TransformListener(self.tf, self)
 
@@ -79,9 +70,9 @@ class Probe(Node):
         return max(common) if common else None
 
     def send(self, positions):
-        message = JointTrajectory()
-        message.joint_names = [f'joint{i}' for i in range(1, 7)]
-        message.points = [JointTrajectoryPoint(positions=list(map(float, positions)))]
+        message = JointState()
+        message.name = [f'joint{i}' for i in range(1, 7)]
+        message.position = list(map(float, positions))
         self.command.publish(message)
 
 
@@ -90,7 +81,6 @@ def main():
     parser.add_argument('--config', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--camera-calibration', action='store_true')
-    parser.add_argument('--servo-smoke-config', type=Path, help='Use existing W/RSP and exercise a small Cartesian command')
     parser.add_argument('--stream', action='store_true')
     args = parser.parse_args()
     config = yaml.safe_load(args.config.read_text())
@@ -112,28 +102,7 @@ def main():
         isaac = start(['bash', str(repo/'runtime/isaac/run-isaac-ros.sh'), str(args.config), '--control-stdin'] +
                       (['--camera-calibration'] if args.camera_calibration else []) + (['--stream'] if args.stream else []),
                       'isaac', stdin=subprocess.PIPE, text=True)
-        start(['ros2', 'run', 'piper_sim_devices', 'isaac_arm_driver', '--ros-args',
-               '-r', '__ns:='+config['driver_namespace'], '-p', 'use_sim_time:=true',
-               '-p', 'urdf_file:='+config['urdf_file']], 'relay')
-        mount_args = [value for name, value in zip(
-            ('--x', '--y', '--z', '--qx', '--qy', '--qz', '--qw'),
-            map(str, config['camera_mount'])) for value in (name, value)]
-        start(['ros2', 'run', 'tf2_ros', 'static_transform_publisher'] + mount_args + [
-            '--frame-id', 'link6', '--child-frame-id', config['optical_frame'], '--ros-args',
-            '-p', 'use_sim_time:=true'], 'mount')
-        if args.servo_smoke_config:
-            w = yaml.safe_load(args.servo_smoke_config.read_text())['w']
-            start(['ros2', 'launch', 'w_moveit_servo', 'w_servo.launch.py'] +
-                  [f'{k}:={v}' for k, v in w.items()] + ['use_sim_time:=true',
-                   'joint_states_topic:='+config['driver_namespace']+'/joint_states',
-                   'command_out_topic:='+config['driver_namespace']+'/command'], 'w')
-        else:
-            rsp_file = args.output/'rsp.yaml'
-            rsp_file.write_text(yaml.safe_dump({'robot_state_publisher': {'ros__parameters': {
-                'robot_description': Path(config['urdf_file']).read_text(),
-                'use_sim_time': True, 'publish_frequency': 100.}}}))
-            start(['ros2', 'run', 'robot_state_publisher', 'robot_state_publisher', '--ros-args',
-                   '--params-file', str(rsp_file), '-r', 'joint_states:='+config['driver_namespace']+'/joint_states'], 'rsp')
+        start(['ros2', 'launch', 'piper_sim_devices', 'devices.launch.py', 'config:='+str(args.config)], 'devices')
         probe.wait(lambda: probe.matching() and probe.joints is not None and probe.clock > 0, 'RGB-D, joints and clock')
         probe.wait(lambda: probe.matching() and probe.tf.can_transform(
             'base_link', config['optical_frame'], Time(nanoseconds=probe.matching())),
@@ -219,51 +188,6 @@ def main():
         result['rsp_physics_agreement'] = dict(position_error_m=position_error, rotation_error_rad=angle_error)
         isaac.stdin.write('resume\n'); isaac.stdin.flush()
         probe.wait(lambda: probe.clock > paused and max(probe.frames['rgb']) > paused_stamp, 'resume', 20.)
-        if args.servo_smoke_config:
-            from nankai_sim_integration.scene_support import allow_fixed_mount_contact
-            result['mounting_contact'] = allow_fixed_mount_contact(probe)
-            publisher = probe.create_publisher(TwistStamped, '/m_servo/twist', 1)
-            moving = False
-            def twist():
-                message = TwistStamped()
-                message.header.stamp = probe.get_clock().now().to_msg()
-                message.header.frame_id = 'base_link'
-                message.twist.linear.z = .002 if moving else 0.
-                publisher.publish(message)
-            timer = probe.create_timer(.02, twist)
-            client = probe.create_client(Trigger, '/w_servo/start_servo')
-            probe.wait(client.service_is_ready, 'W start service', 20.)
-            probe.spin_for(.5)
-            future = client.call_async(Trigger.Request())
-            probe.wait(future.done, 'W start response', 5.)
-            assert future.result().success
-            probe.spin_for(.5)
-            reference_stamp = Time.from_msg(probe.joints.header.stamp)
-            probe.wait(lambda: probe.tf.can_transform('base_link', 'grasp_tcp', reference_stamp), 'TCP TF')
-            before = probe.tf.lookup_transform('base_link', 'grasp_tcp', reference_stamp).transform.translation.z
-            joints_before = dict(zip(probe.joints.name, probe.joints.position))
-            probe.trajectories.clear()
-            moving = True
-            begin = probe.clock
-            probe.wait(lambda: probe.clock-begin > 2*10**9, 'two simulation seconds of W input', 15.)
-            moving = False
-            probe.spin_for(.5)
-            after = probe.tf.lookup_transform('base_link', 'grasp_tcp', Time()).transform.translation.z
-            result['servo'] = dict(start_tcp_z=before, end_tcp_z=after, status=probe.servo_status,
-                                    commanded_linear_z_m_s=.002, measured_displacement_z_m=after-before,
-                                    joints_before=joints_before,
-                                    joints_after=dict(zip(probe.joints.name, probe.joints.position)),
-                                    trajectory_count=len(probe.trajectories),
-                                    target_samples=[{'names': m.joint_names,
-                                        'positions': list(m.points[0].positions)}
-                                        for m in probe.trajectories[::max(1, len(probe.trajectories)//10)]
-                                        if m.points])
-            stop_client = probe.create_client(Trigger, '/w_servo/stop_servo')
-            stop_future = stop_client.call_async(Trigger.Request())
-            probe.wait(stop_future.done, 'W stop response', 5.)
-            assert stop_future.result().success
-            probe.destroy_timer(timer)
-            assert after-before > .001, result['servo']
         assert position_error < .002 and angle_error < .003, result['rsp_physics_agreement']
         result['passed'] = True
     except Exception as error:

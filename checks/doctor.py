@@ -13,7 +13,7 @@ def doctor(config):
     required = [Path(config['isaac_env'])/'bin/python', Path('/opt/ros/humble/setup.bash'),
                 p['install']/'devices/local_setup.bash']
     if config.get('main_project'):
-        required += [p['install']/'main/local_setup.bash', p['install']/'servo/local_setup.bash',
+        required += [p['install']/'main/local_setup.bash',
                      p['install']/'integration/local_setup.bash']
     if config.get('streaming', {}).get('enabled'):
         required += [p['sdk']/'nvenc/libnvenc_fix.so', p['sdk']/'turn/bin/turnserver',

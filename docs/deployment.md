@@ -23,9 +23,13 @@ bash deploy/bootstrap.sh /private/machine.json
 ./piper --local --config /private/machine.json check devices
 ```
 
-bootstrap 在缺少系统 Python 的裸镜像上先安装 Python 3，再调用同一个 deploy 入口；日后直接执行 `./piper --local --config /private/machine.json deploy`。Isaac 环境可使用镜像已有的 `/root/miniconda3/bin/python3.12` 创建，不依赖交互 shell 激活 Conda。build 编译 ROS 程序、构建或复用 engine、生成机器人模型，不编译 USD 场景。start/check 另外执行轻量配置生成。
+bootstrap 在缺少系统 Python 的裸镜像上先安装 Python 3，再调用同一个 deploy 入口；日后直接执行 `./piper --local --config /private/machine.json deploy`。Isaac 环境可使用镜像已有的 `/root/miniconda3/bin/python3.12` 创建，不依赖交互 shell 激活 Conda。build 编译 ROS 程序、构建或复用 engine、生成机器人模型及引用源 USD 的控制派生层；不烘焙渲染场景。start/check 另外执行轻量配置生成。
+
+模型生成、校验失败或键盘中断时，删除本次模型半成品，保留原模型链接；只有输入与场景验证通过后才切换模型。
 
 按实际路径所在的磁盘预留安装与解包空间。私有 SDK、engine、生成的 ROS 模型、构建产物和运行记录集中在 data_root 下的 sdk、assets、models、build、install、logs、reports、state、cache，以及抓取依赖安装记录 dependencies。Isaac 环境使用 isaac_env 指定的路径，默认才是 data_root/envs/isaac；源 USD、URDF 和制作缓存可以位于其他外部目录。系统依赖由包管理器安装到系统目录。
+
+install 使用符号链接引用 build 中的部分运行文件，清理空间时须保留这些目标，不能直接整删 build；可清理范围见[日常操作](operation.md#空间清理)。
 
 运行配置由 start 写入 data_root/logs/session-*/config，GPU check 写入 data_root/reports/<检查类型>-*/config；旧 data_root/config 目录不再用于运行配置。重复安装使用包管理器和实际版本检查；失败日志保存在 logs、dependencies 或 sdk 下对应组件目录，修正原因后重跑对应命令。
 
@@ -33,7 +37,7 @@ bootstrap 在缺少系统 Python 的裸镜像上先安装 Python 3，再调用�
 
 普通 PyPI 依赖默认使用清华 HTTPS 镜像 `https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple`，Isaac 专用 wheel 保留 NVIDIA 额外索引。地址按[清华镜像使用说明](https://mirrors.tuna.tsinghua.edu.cn/help/pypi/)配置。需要其他源时在机器配置填写 `pypi_index_url`；脚本只对本次安装传参，不改用户全局 pip 配置。
 
-系统 ROS 安装保留 APT／locale 备份和官方签名；依赖解析不允许移除软件包。当前镜像的 ICU 版本差异作为显式兼容分支处理，其他不匹配版本会报错。
+系统 ROS 安装保留 APT／locale 备份和官方签名；依赖解析不允许移除软件包。依赖来自 Humble 的当前 APT 仓库，不安装旧 Servo／ViSP 栈。
 
 `piper` 和 ROS 工具使用系统 Python，Isaac 仅使用独立环境。版本清单固定 Isaac、TensorRT 等核心组件；Humble 的 APT 包从当前仓库解析，实际安装版本记录在 reports/installed-packages.tsv，Isaac Python 包版本记录在 reports/isaac-packages.json，不承诺逐字节重建旧 APT 快照。
 
@@ -67,15 +71,15 @@ git clone --single-branch --branch dev \
 ./piper --local --config /private/machine.json check control
 ```
 
-构建只选取接入所需包，build/install/log 均在仿真数据目录。Servo 原脚本按目录结构写输出，因此复制其构建材料到独立暂存目录后调用原脚本。主项目源码、现有构建目录不写入。
+构建选取主项目接口、感知、TCP 宏驱动、几何库和 manipulation 包，再构建仿真设备与实验客户端；build/install/log 均在仿真数据目录。仿真 C++ 节点直接编译外部 Motion／Control／IK 源码，不修改或复制维护主项目代码，不启动其 CAN／Mock 进程。
 
-生成的机器人模型按 `data_root/models/<profile>` 隔离，记录基础／装配 URDF 的路径、文件哈希和 engine 目录。新增 profile 首次接入主项目、变更机器人装配或引用网格时显式 build；启动前的输入检查不覆盖网格内容变化，详见[检查范围](assets.md#修改与新增)。仅调整初始角度、桌子碰撞盒、瓶子高度／半径或执行超时，重启会话即可。主项目原有配置模板仍由其源码提供，仿真端负责注入本次场景参数。
+生成的机器人模型按 `data_root/models/<profile>` 隔离，记录基础／装配 URDF 的路径、文件哈希、源场景路径、瓶子物理基线和 engine 目录。新增 profile 首次接入主项目、变更机器人装配或引用网格时显式 build；启动前的输入检查不覆盖网格内容变化，详见[检查范围](assets.md#修改与新增)。仅调整初始角度、瓶子高度／半径、Pick 张开宽度或主项目运行配置，重启会话即可。修改 bottle_physics 后显式 build。主项目原有配置模板仍由其源码提供，仿真端负责注入本次场景参数。
 
 TensorRT 常驻 SDK 保留运行库、插件、头文件和工具，去除 Linux／Windows 的 engine 构建资源库。只有 engine 缓存缺失、确需重建时，构建脚本才临时获取匹配版本的 Linux 构建资源，完成或失败后清理；有效缓存复用与普通推理不下载它们。
 
-4090 engine 在当前服务器从 ONNX 生成。缓存按模型内容、GPU、TensorRT 和生成器输入区分，manifest 用主项目工具生成。参与构建的文件哈希、提交号和工作区状态保存在 reports/main-build-inputs.json。修改主项目程序、launch 或构建输入后显式重新 build；会话直接读取的三份几何包 YAML 只需重启，具体边界见[日常操作](operation.md)。运行中的进程不自动热更新。
+4090 engine 在当前服务器从 ONNX 生成。缓存按模型内容、GPU、TensorRT 和生成器输入区分，manifest 用主项目工具生成。参与构建的文件哈希、提交号和工作区状态保存在 reports/main-build-inputs.json。修改主项目程序、launch 或构建输入后显式重新 build；会话直接读取的四份 manipulation YAML 只需重启，具体边界见[日常操作](operation.md)。运行中的进程不自动热更新。
 
-M 的 `preview_only=true` 是现有节点的计算模式，输出经原 launch 接入 W，执行仍由 W 服务控制。
+仿真设备 launch 拥有 RSP 和相机静态 TF。主项目 Source／Pick 通过 TcpReference、TcpTrackingState 和新版 MoveGripper 接入；接口更新后服务端与客户端须统一重建、重启。
 
 ## 串流组件
 

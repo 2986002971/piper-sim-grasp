@@ -6,14 +6,15 @@ assembly_urdf: /root/autodl-tmp/piper-model-cache/generated/ac58cb922252a7b21f7f
 # Reviewed device and scene contract; gains are checks, never overrides.
 articulation_prim: ''
 camera_prim: ''
-driver_namespace: /piper_l/standalone
+driver_namespace: /piper/arm
 initial_joint_positions:
-- -0.423197
-- 1.01429
-- -1.37436
-- 1.24916
-- -0.17006
-- -0.7
+# Side-biased, upright initial view for the real YOLO bottle classifier.
+- -0.206155
+- 0.120137
+- -0.394796
+- 0.699284
+- -0.189556
+- -0.064301
 gripper_width_m: 0.1
 physics_hz: 100.0
 # USD angular gains 400 / 50 per degree become 400 / 50 * 180/pi in PhysX radians.
@@ -32,29 +33,21 @@ camera_mount:
 - -0.0008532439719948161
 - 0.984875863359088
 bridge_command_topic: /isaac/piper/joint_command
+bridge_gripper_command_topic: /isaac/piper/gripper_command
 bridge_feedback_topic: /isaac/piper/joint_states
 rgb_topic: /camera/d405/color/image_raw
 depth_topic: /camera/d405/aligned_depth_to_color/image_raw
 camera_info_topic: /camera/d405/color/camera_info
-scene_boxes:
-# Manually approximated MoveIt obstacle in base_link; does not author USD.
-# One solid block encloses the tabletop and legs, matching real-world practice.
-# Retain table_top as the fixed base mounting-contact ID.
-- id: table_top
-  size:
-  - 0.9
-  - 0.8
-  - 0.73
-  position:
-  - 0.25
-  - 0
-  - -0.365
-  quaternion:
-  - 0
-  - 0
-  - 0
-  - 1
+# Explicit integration baseline, not measured properties of the real bottle.
+# Applied to the derived scene by piper build; source USD is preserved.
+bottle_physics:
+  prim: /World/SevenUP_Bottle
+  mass_kg: 0.3
+  static_friction: 0.8
+  dynamic_friction: 0.6
+  restitution: 0.0
+pick:
+  open_width_m: 0.1
 # Manually maintained perception priors; no target pose is supplied to perception.
 bottle_height_m: 0.235
 bottle_radius_m: 0.03656
-execution_timeout_s: 180.0

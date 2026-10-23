@@ -9,8 +9,8 @@ import subprocess
 import tempfile
 import time
 
-from runtime.config import ROOT, paths, write_json
-from deploy.main_project import inspect, stage_servo
+from runtime.config import ROOT, paths, write_json, isaac_command
+from deploy.main_project import inspect
 
 
 def run(command, log, env=None):
@@ -38,7 +38,7 @@ def deploy(config):
          'python3-scipy','python3-opencv','python3-pytest','ffmpeg','vulkan-tools','libvulkan1','libsm6','libegl1','libxt6','iproute2'], log)
     run(['bash',ROOT/'deploy/install-ros2-humble.sh',p['logs']/'ros-install'],log)
     run(['apt-get','install','-y','--no-remove','ros-humble-tf2-ros','ros-humble-robot-state-publisher',
-         'ros-humble-sensor-msgs','ros-humble-trajectory-msgs','ros-humble-launch-ros'],log)
+         'ros-humble-sensor-msgs','ros-humble-launch-ros'],log)
     isaac = Path(config['isaac_env'])
     if not (isaac/'bin/python').exists():
         # AutoDL's noninteractive SSH PATH omits the supplied Conda installation.
@@ -74,13 +74,12 @@ def deploy(config):
             write_json(credentials, {'username': secrets.token_hex(16), 'password': secrets.token_hex(32)}, private=True)
     if config.get('main_project'):
         source = Path(config['main_project']); inspect(source)
-        servo = stage_servo(source, config['data_root'])
         nvcc = Path('/usr/local/cuda-'+lock['cuda'])/'bin/nvcc'
         if not nvcc.exists():
             run(['bash',ROOT/'deploy/install-cuda.sh',p['cache']],log)
         run([nvcc,'--version'],log)
         run(['python3',ROOT/'deploy/install-tensorrt.py','--prefix',p['sdk']/'tensorrt'],log)
-        run(['bash',ROOT/'runtime/ros2-env.sh','bash',ROOT/'deploy/install-grasp-deps.sh',source,config['data_root'],servo],log)
+        run(['bash',ROOT/'runtime/ros2-env.sh','bash',ROOT/'deploy/install-grasp-deps.sh',source,config['data_root']],log)
     installed = subprocess.check_output(['dpkg-query','-W'], text=True)
     (p['reports']/'installed-packages.tsv').write_text(installed)
     python_packages = subprocess.check_output([isaac/'bin/python','-m','pip','list','--format=json'], text=True)
@@ -89,36 +88,56 @@ def deploy(config):
     print('Deployment completed. Prepare the source USD and URDF paths in your profile, then run piper build.', flush=True)
 
 
+def build_model(config, profile, engine, main_inputs, log):
+    """Publish a validated model; a failed build leaves the active model intact."""
+    from runtime.scene import model_directory, model_inputs
+    source = Path(config['main_project'])
+    model_dir = model_directory(config)
+    if model_dir.exists() and not model_dir.is_symlink():
+        raise RuntimeError('Refusing to replace unmanaged model directory: '+str(model_dir))
+    staging = model_dir.parent/('generation-'+str(time.time_ns()))
+    pending = model_dir.with_name('.'+staging.name+'-pending')
+    inputs = model_inputs(profile)
+    published = False
+    try:
+        run(['bash',ROOT/'runtime/ros2-env.sh','python3',ROOT/'deploy/prepare-grasp-model.py',
+             '--main-source',source,'--model-output',staging,'--assembly-urdf',profile['assembly_urdf']],log)
+        scene_args = [ROOT/'models/prepare_control_scene.py', '--scene', profile['scene_usd'],
+                      '--source-urdf', profile['assembly_urdf'],
+                      '--urdf', staging/'assembly.urdf', '--output', staging/'scene.usda']
+        if profile.get('bottle_physics'):
+            scene_args += ['--bottle-physics', json.dumps(profile['bottle_physics'])]
+        run(isaac_command(config, scene_args), log)
+        if inputs != model_inputs(profile):
+            raise RuntimeError('Robot model inputs changed during build; rerun against stable inputs')
+        if main_inputs != inspect(source):
+            raise RuntimeError('Main project changed during build; rerun against stable inputs')
+        write_json(staging/'build.json', {'model_inputs': inputs, 'main_project': str(source.resolve()),
+                                        'engine_directory': str(engine.resolve())})
+        pending.symlink_to(staging.name)
+        pending.replace(model_dir)
+        published = True
+    finally:
+        pending.unlink(missing_ok=True)
+        if not published: shutil.rmtree(staging, ignore_errors=True)
+
+
 def build(config):
-    from runtime.scene import load_profile, model_directory, model_inputs
+    from runtime.scene import load_profile
     profile = load_profile(config)
     p = paths(config)
     if not Path('/opt/ros/humble/setup.bash').is_file(): raise RuntimeError('Run piper deploy first')
     log = p['logs']/'build.log'
     base = ['bash', ROOT/'runtime/ros2-env.sh']
-    run(base+['colcon','--log-base',p['logs']/'devices-build','build','--base-paths',ROOT/'ros2/piper_sim_devices',
-              '--build-base',p['build']/'devices','--install-base',p['install']/'devices','--symlink-install'],log)
     if config.get('main_project'):
         source = Path(config['main_project']); before = inspect(source)
-        servo = stage_servo(source, config['data_root'])
-        run(base+['bash',ROOT/'deploy/build-grasp.sh',source,config['data_root'],servo],log)
+        run(base+['bash',ROOT/'deploy/build-grasp.sh',source,config['data_root']],log)
         from deploy.engine import build_engine
         engine = build_engine(config, log)
-        model_dir = model_directory(config)
-        # The upstream generator intentionally refuses overwriting an output;
-        # generate a new owned directory and publish after validation.
-        staging = Path(config['data_root'])/'models'/('generation-'+str(time.time_ns()))
-        inputs = model_inputs(profile)
-        run(base+['python3',ROOT/'deploy/prepare-grasp-model.py','--main-source',source,
-                  '--model-output',staging,'--assembly-urdf',profile['assembly_urdf']],log)
-        if inputs != model_inputs(profile):
-            raise RuntimeError('Robot model inputs changed during build; rerun against stable inputs')
-        write_json(staging/'build.json', {'model_inputs': inputs, 'main_project': str(source.resolve()),
-                                        'engine_directory': str(engine.resolve())})
-        if model_dir.is_symlink(): model_dir.unlink()
-        elif model_dir.exists(): raise RuntimeError('Refusing to replace unmanaged model directory: '+str(model_dir))
-        model_dir.symlink_to(staging.name)
-        after = inspect(source)
-        if before != after: raise RuntimeError('Main project changed during build; rerun against stable inputs')
+        build_model(config, profile, engine, before, log)
         write_json(p['reports']/'main-build-inputs.json', before)
+    else:
+        run(base+['colcon','--log-base',p['logs']/'devices-build','build','--base-paths',ROOT/'ros2/piper_sim_devices',
+                  '--build-base',p['build']/'devices','--install-base',p['install']/'devices','--symlink-install',
+                  '--cmake-args','-DNANKAI_MAIN_SOURCE='],log)
     print(f"Build completed for profile {config['profile']}; start/check will prepare fresh runtime configuration.", flush=True)

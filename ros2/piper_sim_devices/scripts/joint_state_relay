@@ -1,0 +1,18 @@
+#!/usr/bin/env python3
+"""Measured state only for camera/device sessions without the external main project."""
+import rclpy
+from sensor_msgs.msg import JointState
+from rclpy.qos import qos_profile_sensor_data
+
+rclpy.init()
+node = rclpy.create_node('joint_state_relay')
+topic = node.declare_parameter('bridge_feedback_topic', '/isaac/piper/joint_states').value
+publisher = node.create_publisher(JointState, 'joint_states', 2)
+subscription = node.create_subscription(JointState, topic, publisher.publish, qos_profile_sensor_data)
+try:
+    rclpy.spin(node)
+except (KeyboardInterrupt, rclpy.executors.ExternalShutdownException):
+    pass
+finally:
+    node.destroy_node()
+    if rclpy.ok(): rclpy.shutdown()

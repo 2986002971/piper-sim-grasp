@@ -5,17 +5,48 @@ import tempfile
 import unittest
 import subprocess
 import sys
+from unittest.mock import patch
 
 from models.bundle import verify
-from deploy.main_project import stage_servo, SERVO, PACKAGES, TOOLS, RUNTIME_CONFIGS, build_digest, inspect
+from deploy.main_project import PACKAGES, TOOLS, RUNTIME_CONFIGS, build_digest, inspect
 
 
 class DeploymentTests(unittest.TestCase):
+    def test_failed_or_interrupted_model_build_preserves_active_model(self):
+        from deploy.pipeline import build_model
+        for failure in ('generator', 'changed_inputs', 'interrupted'):
+            with self.subTest(failure=failure), tempfile.TemporaryDirectory() as temp:
+                root = Path(temp)
+                models = root/'models'
+                active = models/'previous'
+                active.mkdir(parents=True)
+                (active/'robot.urdf').write_text('previous model')
+                (models/'7up').symlink_to(active.name)
+                config = {'data_root': str(root), 'profile': '7up',
+                          'main_project': str(root/'main'), 'isaac_env': '/isaac'}
+                profile = {'scene_usd': '/scene.usda', 'assembly_urdf': '/assembly.urdf'}
+                def generate(command, log):
+                    if '--model-output' in command:
+                        output = Path(command[command.index('--model-output')+1])
+                        output.mkdir()
+                        (output/'robot.urdf').write_text('partial model')
+                        if failure == 'generator': raise RuntimeError('generator failed')
+                        if failure == 'interrupted': raise KeyboardInterrupt()
+                error = KeyboardInterrupt if failure == 'interrupted' else RuntimeError
+                with patch('deploy.pipeline.run', side_effect=generate), \
+                        patch('runtime.scene.model_inputs', return_value={}), \
+                        patch('deploy.pipeline.inspect', return_value={'changed': True}), \
+                        self.assertRaises(error):
+                    build_model(config, profile, root/'engine', {}, root/'build.log')
+                self.assertEqual((models/'7up').resolve(), active)
+                self.assertEqual((active/'robot.urdf').read_text(), 'previous model')
+                self.assertEqual(sorted(p.name for p in models.iterdir()), ['7up', 'previous'])
+
     def test_missing_session_templates_are_reported_before_build_or_start(self):
         with tempfile.TemporaryDirectory() as tmp:
             source = Path(tmp)
             required = [source/package/'package.xml' for package in PACKAGES]
-            required += [source/tool for tool in TOOLS]+[source/SERVO/'build_overlay.py']
+            required += [source/tool for tool in TOOLS]
             for path in required:
                 path.parent.mkdir(parents=True, exist_ok=True)
                 path.write_text('fixture')
@@ -27,12 +58,12 @@ class DeploymentTests(unittest.TestCase):
 
     def test_runtime_config_edits_do_not_require_rebuild_but_code_edits_do(self):
         original = {name: 'old' for name in RUNTIME_CONFIGS}
-        original['src/w_moveit_servo/src/twist_filter.cpp'] = 'code'
-        original['src/w_moveit_servo/config/input.yaml'] = 'installed-config'
+        original['src/manipulation/nankai_robocup_arm_control/src/motion.cpp'] = 'code'
+        original['src/manipulation/nankai_robocup_arm_control/config/robot.urdf'] = 'installed-config'
         runtime_edits = dict(original, **{name: 'new' for name in RUNTIME_CONFIGS})
         self.assertEqual(build_digest(original), build_digest(runtime_edits))
-        for name in ('src/w_moveit_servo/src/twist_filter.cpp',
-                     'src/w_moveit_servo/config/input.yaml'):
+        for name in ('src/manipulation/nankai_robocup_arm_control/src/motion.cpp',
+                     'src/manipulation/nankai_robocup_arm_control/config/robot.urdf'):
             changed = dict(runtime_edits); changed[name] = 'changed'
             self.assertNotEqual(build_digest(original), build_digest(changed))
 
@@ -64,14 +95,6 @@ class DeploymentTests(unittest.TestCase):
                 'files':{'../outside':hashlib.sha256(b'external').hexdigest()}}))
             with self.assertRaisesRegex(ValueError,'outside'): verify(root)
 
-    def test_servo_copy_cannot_write_external_checkout(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            source=Path(tmp)/'main';target=source/SERVO;target.mkdir(parents=True)
-            (target/'build_overlay.py').write_text('source')
-            copy=stage_servo(source,Path(tmp)/'data')
-            (copy/SERVO/'build_overlay.py').write_text('changed copy')
-            self.assertEqual((target/'build_overlay.py').read_text(),'source')
-            self.assertFalse((source/'build').exists())
 
 
 if __name__=='__main__':unittest.main()

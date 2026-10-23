@@ -10,8 +10,9 @@ def check(config, level, streaming=False):
     p = paths(config)
     if level == 'unit':
         subprocess.run(['/usr/bin/python3','-m','unittest','discover','-s',str(ROOT/'tests')],check=True,cwd=ROOT)
-        subprocess.run(['/usr/bin/python3','-m','pytest','-q',str(ROOT/'ros2/piper_sim_devices/test')],
-                       check=True,env=dict(os.environ,PYTHONPATH=str(ROOT/'ros2/piper_sim_devices')))
+        if config.get('main_project'):
+            for name in ('controller_check', 'upstream_gripper_check', 'upstream_motion_check'):
+                subprocess.run([p['build']/'devices/piper_sim_devices'/name], check=True)
         return
     if level in ('control','perception') and not config.get('main_project'):
         raise ValueError('This acceptance level requires main_project')
@@ -26,10 +27,11 @@ def check(config, level, streaming=False):
             command = ['python3',ROOT/'checks/check_sim_perception.py',
                        '--devices-config',prepared['devices'],'--alignment-config',prepared['alignment'],
                        '--detector-config',prepared['detector'],'--output',output]
+        elif level == 'control':
+            command = ['python3', ROOT/'checks/check_sim_control.py', '--config', prepared['devices'], '--output', output]
         else:
             command = ['python3',ROOT/'checks/check_sim_devices.py','--config',prepared['devices'],
                        '--camera-calibration','--output',output]
-            if level == 'control': command += ['--servo-smoke-config',prepared['alignment']]
         if streaming:
             if level == 'perception': raise ValueError('Streaming check is available for devices/control')
             from runtime.streaming.turn_config import relay_ip

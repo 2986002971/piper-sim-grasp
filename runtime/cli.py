@@ -40,6 +40,7 @@ def parser():
     start = sub.add_parser('start'); mode = start.add_mutually_exclusive_group()
     mode.add_argument('--stream', action='store_true'); mode.add_argument('--headless', action='store_true')
     experiment = sub.add_parser('experiment'); experiment.add_argument('operation', choices=['start', 'cancel'])
+    experiment.add_argument('--task', choices=['preposition', 'pick'], default='preposition')
     client = sub.add_parser('export-client'); client.add_argument('--output', required=True, type=Path)
     assets = sub.add_parser('assets'); ops = assets.add_subparsers(dest='operation', required=True)
     exp = ops.add_parser('export')
@@ -71,7 +72,7 @@ def execute(args, config):
     if args.action == 'start': return session.run(config, args.stream)
     if args.action == 'status': print(json.dumps(session.status(config), indent=2)); return
     if args.action == 'stop': return session.stop(config)
-    if args.action == 'experiment': return session.experiment(config, args.operation)
+    if args.action == 'experiment': return session.experiment(config, args.operation, args.task)
     if args.action == 'export-client':
         if not session.status(config)['manager_active']: raise RuntimeError('Start a streaming session first')
         content = json.loads((paths(config)['state']/'viewer-runtime.json').read_text())
@@ -87,7 +88,7 @@ def main():
         if not args.local and config.get('ssh') and args.action in ('start', 'stop', 'status', 'experiment', 'doctor'):
             command = [args.action]
             if args.action == 'start' and args.stream: command += ['--stream']
-            if args.action == 'experiment': command += [args.operation]
+            if args.action == 'experiment': command += [args.operation, '--task', args.task]
             raise SystemExit(forward(config, command))
         if not args.local and config.get('ssh') and args.action == 'export-client':
             # Capture the private payload, never print credentials to the terminal.

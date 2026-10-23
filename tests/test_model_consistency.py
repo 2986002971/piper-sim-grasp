@@ -1,67 +1,49 @@
-"""Regression: reject arm geometry from a different assembly revision."""
+"""The external model remains read only; simulation derives matching articulation frames."""
 import importlib.util
 from pathlib import Path
 import tempfile
 import unittest
 import xml.etree.ElementTree as ET
 
-try:
-    spec = importlib.util.spec_from_file_location('grasp_model', Path(__file__).resolve().parents[1]/'deploy/prepare-grasp-model.py')
-    model = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(model)
-except ImportError:
-    model = None
+spec = importlib.util.spec_from_file_location('grasp_model', Path(__file__).resolve().parents[1]/'deploy/prepare-grasp-model.py')
+model = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(model)
 
 
-@unittest.skipIf(model is None, 'requires numpy, scipy and yaml')
 class ModelConsistencyTests(unittest.TestCase):
-    def test_bracket_exemption_keeps_geometry_and_other_pairs_checked(self):
-        with tempfile.TemporaryDirectory() as temporary:
-            path = Path(temporary)/'assembly.urdf'
-            path.write_text('''<robot>
-              <link name="d405_link"><collision><geometry><box size=".02 .04 .04"/></geometry></collision></link>
-              <link name="d405_bracket"><visual><geometry><mesh filename="bracket.stl" scale=".001 .001 .001"/></geometry></visual></link>
-              <joint name="camera" type="fixed"><parent link="link6"/><child link="d405_link"/></joint>
-              <joint name="bracket" type="fixed"><parent link="link6"/><child link="d405_bracket"/></joint>
-            </robot>''')
-            robot = ET.fromstring('''<robot><link name="link3"/><link name="link4"/><link name="link5"/><link name="link6"/>
-              <joint name="joint4" type="revolute"><parent link="link3"/><child link="link4"/></joint>
-              <joint name="joint5" type="revolute"><parent link="link4"/><child link="link5"/></joint>
-              <joint name="joint6" type="revolute"><parent link="link5"/><child link="link6"/></joint>
-            </robot>''')
-            semantic = ET.fromstring('<robot/>')
-            model.add_device_collisions(robot, semantic, path)
-            excluded = {frozenset((e.get('link1'), e.get('link2'))) for e in semantic.findall('disable_collisions')}
-            self.assertIn(frozenset(('link4', 'sim_d405_bracket')), excluded)
-            self.assertNotIn(frozenset(('link3', 'sim_d405_bracket')), excluded)
-            self.assertNotIn(frozenset(('link4', 'sim_d405_link')), excluded)
-            self.assertIsNotNone(robot.find("link[@name='sim_d405_bracket']/collision/geometry/mesh"))
-
-    def test_mixed_joint_frame_and_scaled_mesh_are_rejected(self):
-        with tempfile.TemporaryDirectory() as temporary:
-            directory = Path(temporary)
-            mesh = directory/'body.stl'
-            mesh.write_bytes(b'geometry fixture')
-            robot = ET.fromstring(f'''<robot>
-              <link name="link4"/><link name="link5"><collision><geometry>
-                <mesh filename="{mesh.as_uri()}"/>
-              </geometry></collision></link>
-              <joint name="joint5" type="revolute"><parent link="link4"/>
-                <child link="link5"/><origin xyz="0.07466 0 0"/><axis xyz="0 0 1"/>
-              </joint></robot>''')
+    def test_prepare_uses_macro_geometry_and_keeps_assembly_body_names(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            main = root/'main'
+            config = main/'src/manipulation/nankai_robocup_arm_control/config'
+            config.mkdir(parents=True)
+            robot = ET.Element('robot', name='test')
+            ET.SubElement(robot, 'link', name='piper_base_link')
+            for i in range(1,9):
+                joint = ET.SubElement(robot, 'joint', name=f'joint{i}', type='revolute' if i<=6 else 'prismatic')
+                ET.SubElement(joint, 'parent', link='piper_base_link' if i==1 else f'link{i-1}')
+                ET.SubElement(joint, 'child', link=f'link{i}')
+                ET.SubElement(joint, 'origin', xyz='0 -.03526 0' if i==6 else '0 0 0')
+                ET.SubElement(joint, 'axis', xyz='0 0 1')
+                ET.SubElement(joint, 'limit', lower='-3.141593', upper='3.141593')
+                ET.SubElement(robot, 'link', name=f'link{i}')
+            nominal = config/'robot.urdf'
+            ET.ElementTree(robot).write(nominal)
             assembly = ET.fromstring(ET.tostring(robot))
-            assembly.find('.//mesh').set('filename', 'body.stl')
-            path = directory/'assembly.urdf'
-            def check():
-                ET.ElementTree(assembly).write(path)
-                model.validate_robot_geometry(robot, path)
-            check()
-            assembly.find('joint/origin').set('xyz', '0.076857 0.00062395 0')
-            with self.assertRaisesRegex(ValueError, 'origin differs'): check()
-            assembly.find('joint/origin').set('xyz', '0.07466 0 0')
-            assembly.find('.//mesh').set('scale', '0.8 0.8 0.8')
-            with self.assertRaisesRegex(ValueError, 'scale differs'): check()
+            assembly.find("link[@name='piper_base_link']").set('name','base_link')
+            assembly.find("joint[@name='joint1']/parent").set('link','base_link')
+            assembly.find("joint[@name='joint6']/origin").set('xyz','0 -.035 0')
+            assembly_file = root/'assembly.urdf'
+            ET.ElementTree(assembly).write(assembly_file)
+            before = nominal.read_bytes(), assembly_file.read_bytes()
+            output = model.prepare(main, assembly_file, root/'output')
+            derived = ET.parse(output/'robot.urdf').getroot()
+            physical = ET.parse(output/'assembly.urdf').getroot()
+            self.assertEqual(derived.find("joint[@name='sim_base_alias']/child").get('link'),'base_link')
+            self.assertEqual(derived.find("joint[@name='joint1']/parent").get('link'),'base_link')
+            self.assertEqual(physical.find("joint[@name='joint6']/origin").get('xyz'),'0 -.03526 0')
+            self.assertEqual(physical.find("joint[@name='joint6']/limit").get('upper'),'3.141593')
+            self.assertEqual(before, (nominal.read_bytes(),assembly_file.read_bytes()))
 
 
-if __name__ == '__main__':
-    unittest.main()
+if __name__ == '__main__': unittest.main()

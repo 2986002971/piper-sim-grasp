@@ -118,9 +118,9 @@ def run(config, streaming=False):
         prepared = prepare(config, configuration)
         devices = prepared['devices']
         profile = prepared['profile']
-        state.update(scene_usd=profile['scene_usd'], configuration_directory=str(configuration))
+        state.update(scene_usd=prepared['scene_usd'], source_scene_usd=profile['scene_usd'], configuration_directory=str(configuration))
         write_json(p['state']/'session.json', state, private=True)
-        print(f"Profile: {config['profile']} | USD: {profile['scene_usd']}", flush=True)
+        print(f"Profile: {config['profile']} | USD: {prepared['scene_usd']}", flush=True)
         print('Runtime configuration: '+str(configuration), flush=True)
         if streaming:
             if not config.get('streaming', {}).get('enabled'):
@@ -170,9 +170,12 @@ def run(config, streaming=False):
                     state.pop('experiment_error', None)
                     state.pop('experiment_exit_code', None)
                     command = ['ros2', 'launch', 'nankai_sim_integration', 'experiment.launch.py',
+                               'task:='+request.get('task', 'preposition'),
                                'alignment_config:='+str(prepared['alignment']),
+                               'pick_config:='+str(prepared['pick']),
                                'detector_config:='+str(prepared['detector']),
                                'driver_namespace:='+profile['driver_namespace'],
+                               'device_state:='+str(p['state']/'devices/device-state.json'),
                                'output_dir:='+str(experiment_directory)]
                     # Experiments have their own lifetime; their exit does not close devices.
                     experiment_proc = spawn(experiment_name, ros_command(config, command, main=True), env)
@@ -194,11 +197,11 @@ def run(config, streaming=False):
         lock.close()
 
 
-def experiment(config, action):
+def experiment(config, action, task='preposition'):
     state = status(config)
     if not state['manager_active']: raise RuntimeError('Start devices first')
     if action == 'start' and state.get('profile') != config['profile']:
         raise ValueError('Active profile is '+str(state.get('profile'))+'; stop/start the session to switch profiles')
     if action == 'start' and not state.get('ros_devices_ready'): raise RuntimeError('ROS devices are not ready')
     if action == 'start' and not config.get('main_project'): raise ValueError('main_project is not configured')
-    write_json(paths(config)['state']/'experiment-request.json', {'action': action}, private=True)
+    write_json(paths(config)['state']/'experiment-request.json', {'action': action, 'task': task}, private=True)

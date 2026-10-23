@@ -41,7 +41,7 @@ def load(filename):
 
 def paths(config):
     data = Path(config['data_root'])
-    return {name: data/name for name in ('envs', 'sdk', 'assets', 'config', 'build',
+    return {name: data/name for name in ('envs', 'sdk', 'assets', 'build',
                                         'install', 'logs', 'state', 'reports', 'cache')}
 
 
