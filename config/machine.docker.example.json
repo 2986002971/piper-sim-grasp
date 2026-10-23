@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "repo_path": "/workspace/piper-sim-grasp",
+  "data_root": "/data/piper",
+  "isaac_env": "/opt/isaac-env",
+  "profile": "7up",
+  "main_project": null,
+  "ros_domain_id": 0,
+  "watchdog_seconds": 4500,
+  "streaming": {
+    "enabled": false
+  }
+}

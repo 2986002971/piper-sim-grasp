@@ -1,5 +1,18 @@
 # 验收记录
 
+## 本地 4080／Tailscale 接入（2026-10-16）
+
+- Ubuntu 22.04 容器、Isaac Sim 6.1.0.0，宿主 RTX 4080 Laptop 12 GB；Docker 使用 host 网络。
+- SSH 监听 `0.0.0.0:2222`，仅公钥认证；宿主经本机 Tailscale 域名使用统一入口完成 doctor、start、status、export-client 和 stop。
+- HAProxy 监听 `0.0.0.0:6008`，后端源地址保持绑定所选 IPv4；Isaac 信令实际监听 `0.0.0.0:6006`，无需修改信令绑定参数。
+- 显式选择 Tailscale IPv4 作为 relay／媒体广告地址，避免默认路由选中宿主代理 TUN。保持 TURN/TCP、HAProxy、coturn 和内部 UDP 媒体链路。
+- 串流 experience 的设备验收通过，最大投影误差约 1.25 px，RSP／物理相机位置差约 0.12 mm；关节、深度、时钟与暂停恢复通过。
+- Firefox 158 无头真实浏览器持续解码 1920×1080 视频 120 秒；主动断开、重连、刷新通过。前后截图确认可信输入改变了远端视口中的机器人、瓶子和桌面投影。
+- stop 后 TCP 6006／6008／16010 与 UDP 47998 释放，SSH 保持可用。独立诊断浏览器已关闭，其 Snap 驱动经对应用户 scope 清理。
+- 私有证据保存在本机 `local/wiring-browser`、`local/wiring-stopped-status.json` 与设备报告 `devices-1792148972367584985`。
+
+这次验证来自宿主访问本机 Tailscale 地址；尚未在另一台 Tailnet 机器上验收，不代表跨机延迟、长期稳定性或完整抓取通过。原资产材质类型与旧 USD 格式提示仍保留。
+
 独立验收的详细结果保存在服务器 data_root/reports；日常实验结果保存在 data_root/logs/session-*/experiment-*，由 status 的 experiment_directory 指出。记录通过、失败和未执行，不能用历史结果替代当前部署。
 
 ## 2026-10-23：服务器空间清理

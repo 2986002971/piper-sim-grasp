@@ -61,7 +61,7 @@ def cancel_experiment(config, proc, env):
 def stream_config(config, directory):
     stream = config['streaming']
     credentials = json.loads(Path(stream['credentials_file']).read_text())
-    address = relay_ip()
+    address = relay_ip(stream.get('relay_ip'))
     for kind, port in [(socket.SOCK_STREAM, p) for p in (6006, 6008, 16010)]+[(socket.SOCK_DGRAM, 47998)]:
         with socket.socket(socket.AF_INET, kind) as sock:
             try: sock.bind(('0.0.0.0', port))
@@ -72,7 +72,7 @@ def stream_config(config, directory):
     ingress.write_text('\n'.join([
         'global', '  maxconn 128', 'defaults', '  mode tcp', '  timeout connect 5s',
         '  timeout client 75m', '  timeout server 75m', 'frontend autodl_turn_tcp',
-        '  bind 127.0.0.1:6008', '  default_backend coturn_tcp', 'backend coturn_tcp',
+        '  bind 0.0.0.0:6008', '  default_backend coturn_tcp', 'backend coturn_tcp',
         f'  server coturn {address}:16010 source {address}', '']))
     viewer = {'turn': {'signalingServer': stream['host'], 'signalingPort': stream['signaling_port'],
         'mediaServer': address, 'mediaPort': 47998,

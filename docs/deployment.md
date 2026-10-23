@@ -85,7 +85,7 @@ TensorRT 常驻 SDK 保留运行库、插件、头文件和工具，去除 Linux
 
 将 `streaming.enabled` 设为 true，填写公网 host、信令和 TURN 转发端口，以及服务器私有凭据文件路径，再运行 deploy。凭据不存在时自动创建，不打印到终端。
 
-平台 TCP 转发：公网信令 → 容器 6006；公网 TURN → 容器 loopback 6008。HAProxy 从 6008 转到 coturn 的容器 IPv4:16010；coturn 到 Isaac 使用 UDP 47998。当前网络方式保持 TURN/TCP，Viewer 独立运行。
+外部 TCP 入口：信令 → Isaac 6006；TURN → HAProxy 0.0.0.0:6008。HAProxy 从 6008 转到 coturn 的容器 IPv4:16010；coturn 到 Isaac 使用 UDP 47998。当前网络方式保持 TURN/TCP，Viewer 独立运行。AutoDL 使用平台转发，本地 Docker／Tailscale 接入方式见[串流网络约束](streaming-network.md)。
 
 公网端口使用每台实例已有的映射，不要求开放公网 UDP，也不修改平台网络。HAProxy 的源地址绑定及其他约束见[串流网络约束](streaming-network.md)。
 

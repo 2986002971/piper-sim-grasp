@@ -1,10 +1,10 @@
-# AutoDL 串流网络约束
+# 串流网络约束
 
-这套拓扑已经过 AutoDL 实测，是既定架构。目录整理、启动器合并和生命周期重构必须保留它；修改网络拓扑需另行与维护者讨论。
+保留经过 AutoDL 实测的 TURN/TCP、HAProxy 与 coturn 链路。本地 Tailscale 接入复用相同链路，HAProxy 入口统一监听 `0.0.0.0:6008`；本地浏览器媒体连接仍需另行验收。
 
 ```text
-浏览器 ── WS / 公网 TCP 转发 ──> Isaac 信令 :6006
-浏览器 ── TURN/TCP 公网转发 ──> loopback :6008
+浏览器 ── WS / TCP 入口 ──────> Isaac 信令 :6006
+浏览器 ── TURN/TCP 入口 ──────> HAProxy 0.0.0.0:6008
                                   │ HAProxy，源地址绑定容器 IPv4
                                   └──> coturn 容器 IPv4:16010
                                            │ 容器内部 UDP
@@ -12,7 +12,11 @@
 管理机 ── SSH ──> 服务器会话管理器及所属进程
 ```
 
-公网只需要既有 TCP 转发和管理 SSH。Viewer 使用 `iceTransportPolicy=relay` 和 `turn:…?transport=tcp`；媒体仍经 TURN/TCP 公网入口。coturn 与 Isaac 位于同一容器网络命名空间，relay 地址及 Isaac 广告地址使用容器 IPv4，无 `external-ip`。UDP relay 分配端口保持 49152–49215。
+外部访问使用 TCP 入口和管理 SSH。Viewer 使用 `iceTransportPolicy=relay` 和 `turn:…?transport=tcp`；媒体仍经 TURN/TCP 入口。coturn 与 Isaac 位于同一网络命名空间，relay 地址及 Isaac 广告地址使用该命名空间中的非回环 IPv4，无 `external-ip`。UDP relay 分配端口保持 49152–49215。
+
+AutoDL 原先由平台转发连接容器内部回环入口；本地 Docker／Tailscale 没有这层隐式转发，因此 HAProxy 改为监听所有 IPv4 地址。bridge 模式仍需发布入口端口；host 模式直接使用宿主端口。`0.0.0.0` 表示监听地址，不写入客户端连接地址；客户端使用机器配置中的 Tailscale 地址或其他可达主机地址。
+
+host 网络下可用 `streaming.relay_ip` 指定实际网卡 IPv4，例如本机 Tailscale 地址；启动时会校验该地址确实存在。省略时继续按默认路由自动选择。代理 TUN 可能成为默认出口，因此 Tailscale 部署应显式指定其地址，避免把代理虚拟地址用于 coturn、Isaac 媒体地址和 HAProxy 后端源地址。
 
 HAProxy 的 `source <容器 IPv4>` 必须保留。此前平台直接从 loopback 连 coturn 时，Allocate 认证成功仍可能收集不到 Firefox relay candidate；绑定容器 IPv4 后的路线已有持续视频、重连和刷新证据。历史原因推断是浏览器校验 mapped 地址时拒绝 loopback；没有保留原始 Allocate 字段，不能把该推断说成逐字段证实。不要因看似多一跳而删除 HAProxy，也不要仅因 SDK 默认值将既有 WS 改成 WSS。
 

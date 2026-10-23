@@ -20,7 +20,7 @@ class RuntimeTests(unittest.TestCase):
                     with exclusive_operation(config): self.fail('Acquired overlapping lock')
             with exclusive_operation(config): pass
 
-    def test_preserve_autodl_tcp_streaming_topology(self):
+    def test_preserve_tcp_streaming_topology(self):
         with tempfile.TemporaryDirectory() as temp:
             directory=Path(temp)
             credentials=directory/'credentials.json'
@@ -31,7 +31,7 @@ class RuntimeTests(unittest.TestCase):
                  patch('runtime.session.socket.socket'):
                 address,turn,ingress,viewer=session.stream_config(config,directory)
             self.assertEqual(address,'172.17.0.6')
-            self.assertIn('bind 127.0.0.1:6008',ingress.read_text())
+            self.assertIn('bind 0.0.0.0:6008',ingress.read_text())
             self.assertIn('server coturn 172.17.0.6:16010 source 172.17.0.6',ingress.read_text())
             for line in ('listening-ip=172.17.0.6','listening-port=16010','relay-ip=172.17.0.6',
                          'no-udp','no-tcp-relay','min-port=49152','max-port=49215'):
@@ -48,6 +48,21 @@ class RuntimeTests(unittest.TestCase):
         self.assertIn('allowed-peer-ip=172.17.0.6', text)
         self.assertIn('no-tcp-relay', text)
         self.assertNotIn('external-ip', text)
+
+    def test_host_streaming_uses_selected_interface(self):
+        with tempfile.TemporaryDirectory() as temp:
+            directory = Path(temp)
+            credentials = directory/'credentials.json'
+            credentials.write_text(json.dumps({'username':'a'*32, 'password':'b'*64}))
+            config = {'streaming': {'credentials_file':str(credentials), 'host':'stream.example',
+                                   'signaling_port':6006, 'turn_port':6008, 'relay_ip':'100.127.117.67'}}
+            with patch('runtime.session.relay_ip', return_value='100.127.117.67') as resolve, \
+                 patch('runtime.session.socket.socket'):
+                address, turn, ingress, viewer = session.stream_config(config, directory)
+            resolve.assert_called_once_with('100.127.117.67')
+            self.assertIn('server coturn 100.127.117.67:16010 source 100.127.117.67', ingress.read_text())
+            self.assertIn('relay-ip=100.127.117.67', turn.read_text())
+            self.assertEqual(viewer['turn']['mediaServer'], address)
 
     def test_stale_state_never_kills_reused_pid(self):
         with tempfile.TemporaryDirectory() as temp:

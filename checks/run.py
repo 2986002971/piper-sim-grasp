@@ -35,7 +35,7 @@ def check(config, level, streaming=False):
         if streaming:
             if level == 'perception': raise ValueError('Streaming check is available for devices/control')
             from runtime.streaming.turn_config import relay_ip
-            os.environ['STREAM_PUBLIC_IP'] = relay_ip()
+            os.environ['STREAM_PUBLIC_IP'] = relay_ip(config.get('streaming', {}).get('relay_ip'))
             os.environ['PIPER_NVENC_FILTER'] = str(p['sdk']/'nvenc/libnvenc_fix.so')
             command += ['--stream']
         process = subprocess.run(ros_command(config,command,main=level!='devices'))

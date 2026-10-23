@@ -39,6 +39,7 @@ bash deploy/bootstrap.sh /private/machine.json
 
 - [架构](docs/architecture.md)：目录、进程、ROS／TF／时间边界。
 - [部署](docs/deployment.md)：裸机安装、外部主项目、模型输入和旧配置迁移。
+- [本地 Docker](docs/docker.md)：Humble Desktop 镜像构建、GPU 接入与基础仿真。
 - [操作](docs/operation.md)：启停、实验、串流和日志。
 - [资产](docs/assets.md)：源场景与 profile、可选离线打包和模型制作。
 - [排障](docs/troubleshooting.md)、[验收状态](docs/verification.md)。
